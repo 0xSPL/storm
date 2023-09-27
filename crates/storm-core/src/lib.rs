@@ -1,5 +1,6 @@
 //! Core tools for working with MPQ archives.
 
-#![no_std]
+#![cfg_attr(not(feature = "std"), no_std)]
 
 pub mod consts;
+pub mod error;
