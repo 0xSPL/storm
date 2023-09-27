@@ -108,6 +108,7 @@ impl Buffer {
     }
 
     Ok(Archive {
+      handle: self.reader,
       offset: self.offset,
       header,
       udata: self.udata.take(),

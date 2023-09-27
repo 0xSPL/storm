@@ -2,6 +2,7 @@ use std::path::Path;
 
 use crate::error::Result;
 use crate::parse::read_archive;
+use crate::parse::Handle;
 use crate::types::BTable;
 use crate::types::ExtBTable;
 use crate::types::ExtHTable;
@@ -15,9 +16,11 @@ use crate::types::UserData;
 // =============================================================================
 
 /// MoPaQ Archive
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug)]
 pub struct Archive {
-  // The offset in the file where the archive was found.
+  /// Archive file handle.
+  pub handle: Handle,
+  /// The offset in the file where the archive was found.
   pub offset: u64,
   /// Archive Header.
   pub header: Header,
