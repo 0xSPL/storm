@@ -3,6 +3,7 @@ use storm_utils::traits::ParseContext;
 use storm_utils::traits::ReadExt;
 
 use crate::consts::BT_MASK;
+use crate::consts::MAGIC_ID;
 use crate::error::Error;
 use crate::types::Magic;
 
@@ -69,12 +70,13 @@ impl HeaderV1 {
   pub const SIZE: usize = size_of::<Self>();
 }
 
-impl ParseContext for HeaderV1 {
-  type Context = Magic;
+impl ParseContext<Magic> for HeaderV1 {
   type Error = Error;
 
   /// Parse a V1 header from the given `reader`.
-  fn from_reader<R: ReadExt>(context: Self::Context, reader: &mut R) -> Result<Self, Self::Error> {
+  fn from_reader<R: ReadExt>(context: Magic, reader: &mut R) -> Result<Self, Self::Error> {
+    debug_assert!(context.as_ref() == MAGIC_ID);
+
     Ok(Self {
       magic: context,
       header_size: reader.read_u32_le()?,

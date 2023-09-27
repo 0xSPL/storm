@@ -5,6 +5,8 @@ use storm_utils::traits::ReadExt;
 use storm_utils::utils::DigestMd5;
 
 use crate::error::Error;
+use crate::types::HeaderV1;
+use crate::types::HeaderV2;
 use crate::types::HeaderV3;
 
 // =============================================================================
@@ -81,12 +83,29 @@ impl Deref for HeaderV4 {
   }
 }
 
-impl ParseContext for HeaderV4 {
-  type Context = HeaderV3;
+impl ParseContext<HeaderV1> for HeaderV4 {
   type Error = Error;
 
   /// Parse a V4 header from the given `reader`.
-  fn from_reader<R: ReadExt>(context: Self::Context, reader: &mut R) -> Result<Self, Self::Error> {
+  fn from_reader<R: ReadExt>(context: HeaderV1, reader: &mut R) -> Result<Self, Self::Error> {
+    HeaderV2::from_reader(context, reader).and_then(|context| Self::from_reader(context, reader))
+  }
+}
+
+impl ParseContext<HeaderV2> for HeaderV4 {
+  type Error = Error;
+
+  /// Parse a V4 header from the given `reader`.
+  fn from_reader<R: ReadExt>(context: HeaderV2, reader: &mut R) -> Result<Self, Self::Error> {
+    HeaderV3::from_reader(context, reader).and_then(|context| Self::from_reader(context, reader))
+  }
+}
+
+impl ParseContext<HeaderV3> for HeaderV4 {
+  type Error = Error;
+
+  /// Parse a V4 header from the given `reader`.
+  fn from_reader<R: ReadExt>(context: HeaderV3, reader: &mut R) -> Result<Self, Self::Error> {
     Ok(Self {
       v3: context,
       htable_size: reader.read_u64_le()?,

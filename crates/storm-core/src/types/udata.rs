@@ -2,6 +2,7 @@ use core::mem::size_of;
 use storm_utils::traits::ParseContext;
 use storm_utils::traits::ReadExt;
 
+use crate::consts::MAGIC_UD;
 use crate::error::Error;
 use crate::types::Magic;
 
@@ -46,12 +47,13 @@ impl UserData {
   pub const SIZE: usize = size_of::<Self>();
 }
 
-impl ParseContext for UserData {
-  type Context = Magic;
+impl ParseContext<Magic> for UserData {
   type Error = Error;
 
   /// Reads a user data block from the given `reader`.
-  fn from_reader<R: ReadExt>(context: Self::Context, reader: &mut R) -> Result<Self, Self::Error> {
+  fn from_reader<R: ReadExt>(context: Magic, reader: &mut R) -> Result<Self, Self::Error> {
+    debug_assert!(context.as_ref() == MAGIC_UD);
+
     Ok(Self {
       magic: context,
       udata_size: reader.read_u32_le()?,

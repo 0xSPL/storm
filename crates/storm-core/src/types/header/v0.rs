@@ -109,12 +109,11 @@ impl Deref for Header {
   }
 }
 
-impl ParseContext for Header {
-  type Context = Magic;
+impl ParseContext<Magic> for Header {
   type Error = Error;
 
   /// Parse header from the given `reader`.
-  fn from_reader<R: ReadExt>(context: Self::Context, reader: &mut R) -> Result<Self, Self::Error> {
+  fn from_reader<R: ReadExt>(context: Magic, reader: &mut R) -> Result<Self, Self::Error> {
     let v1: HeaderV1 = HeaderV1::from_reader(context, reader)?;
 
     // Parse more fields, depending on the version
