@@ -12,3 +12,15 @@ pub trait Parse: Sized {
     Self::from_reader(&mut Cursor::new(slice))
   }
 }
+
+pub trait ParseContext: Sized {
+  type Context;
+  type Error;
+
+  fn from_reader<R: ReadExt>(context: Self::Context, reader: &mut R) -> Result<Self, Self::Error>;
+
+  #[inline]
+  fn from_slice(context: Self::Context, slice: &[u8]) -> Result<Self, Self::Error> {
+    Self::from_reader(context, &mut Cursor::new(slice))
+  }
+}
