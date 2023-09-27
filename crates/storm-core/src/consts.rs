@@ -52,3 +52,49 @@ pub const HASH_KEY_HT: u32 = 0xC3AF3770;
 
 /// Hash Key: `hash("(block table)", HashType::File)`.
 pub const HASH_KEY_BT: u32 = 0xEC83B3A3;
+
+// =============================================================================
+// Compression
+// =============================================================================
+
+/// Compression: Huffman Encoded.
+pub const COMP_HUFFMAN: u8 = 0x01;
+
+/// Compression: ZLib.
+pub const COMP_ZLIB: u8 = 0x02;
+
+/// Compression: PKWare Data Compression Library.
+pub const COMP_PKWARE: u8 = 0x08;
+
+/// Compression: BZip2.
+pub const COMP_BZIP2: u8 = 0x10;
+
+/// Compression: Sparse.
+pub const COMP_SPARSE: u8 = 0x20;
+
+/// Compression: IMA ADPCM (mono).
+pub const COMP_IMA_ADPCM_1C: u8 = 0x40;
+
+/// Compression: IMA ADPCM (stereo).
+pub const COMP_IMA_ADPCM_2C: u8 = 0x80;
+
+/// Compression: LZMA.
+pub const COMP_LMZA: u8 = 0x12;
+
+/// Compression: Sparse + ZLib.
+pub const COMP_SPARSE_ZLIB: u8 = COMP_SPARSE | COMP_ZLIB;
+
+/// Compression: Sparse + BZip2.
+pub const COMP_SPARSE_BZIP2: u8 = COMP_SPARSE | COMP_BZIP2;
+
+/// Compression: IMA ADPCM (mono) + PKWare.
+pub const COMP_IMA_ADPCM_1C_PKWARE: u8 = COMP_IMA_ADPCM_1C | COMP_PKWARE;
+
+/// Compression: IMA ADPCM (stereo) + PKWare.
+pub const COMP_IMA_ADPCM_2C_PKWARE: u8 = COMP_IMA_ADPCM_2C | COMP_PKWARE;
+
+/// Compression: IMA ADPCM (mono) + Huffman.
+pub const COMP_IMA_ADPCM_1C_HUFFMAN: u8 = COMP_IMA_ADPCM_1C | COMP_HUFFMAN;
+
+/// Compression: IMA ADPCM (stereo) + Huffman.
+pub const COMP_IMA_ADPCM_2C_HUFFMAN: u8 = COMP_IMA_ADPCM_2C | COMP_HUFFMAN;

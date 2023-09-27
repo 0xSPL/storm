@@ -49,6 +49,18 @@ impl Display for Error {
       ErrorKind::FileInvalidType => write!(f, "file invalid: bad type"),
       ErrorKind::FileCorruptData => write!(f, "file corrupted/unreadable"),
       ErrorKind::FileDataMissing => write!(f, "file not found"),
+      ErrorKind::DecompressionInvalid(mode) => {
+        write!(f, "invalid decompression algorithm: {mode:#04X}")
+      }
+      ErrorKind::DecompressionFeature(feature, name) => {
+        write!(f, "enable `{feature}` feature to use {name}")
+      }
+      ErrorKind::DecompressionNoBytes => {
+        write!(f, "attempted decompression on empty buffer")
+      }
+      ErrorKind::DecompressionFailure => {
+        write!(f, "decompression failed: {}", self.from)
+      }
     }
   }
 }
@@ -89,6 +101,13 @@ pub enum ErrorKind {
   FileInvalidType,
   FileCorruptData,
   FileDataMissing,
+  // ===========================================================================
+  // Decompression Errors
+  // ===========================================================================
+  DecompressionInvalid(u8),
+  DecompressionFeature(&'static str, &'static str),
+  DecompressionNoBytes,
+  DecompressionFailure,
 }
 
 #[derive(Debug)]

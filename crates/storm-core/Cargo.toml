@@ -6,5 +6,27 @@ license = "MIT OR Apache-2.0"
 readme = "README.md"
 
 [dependencies]
+# Core
 byteorder = { version = "1.4", default-features = false, features = ["std"] }
 storm-utils = { version = "=0.1", path = "../storm-utils", default-features = false }
+
+[features]
+default = []
+
+# Enables ADPCM Compression
+adpcm = []
+
+# Enables BZip2 Compression
+bzip2 = []
+
+# Enables Huffman Coding Compression
+huffman = []
+
+# Enables PKWare Compression
+pkware = []
+
+# Enables Sparse Compression
+sparse = []
+
+# Enables ZLib Compression
+zlib = []
