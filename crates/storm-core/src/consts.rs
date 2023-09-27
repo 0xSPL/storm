@@ -2,6 +2,9 @@
 // Parsing
 // =============================================================================
 
+/// Size of disk sector boundary.
+pub const HJUMP: u64 = 0x200;
+
 // Malformed MPQs may contain crazy block positions - we need to "fix" them
 pub const BT_MASK: u32 = 0x0FFFFFFF;
 

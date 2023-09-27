@@ -1,17 +1,23 @@
 use std::error::Error as StdError;
+use std::fmt::Display;
+use std::fmt::Formatter;
+use std::fmt::Result as FmtResult;
 
 pub type Result<T, E = Error> = core::result::Result<T, E>;
 
 #[derive(Debug)]
 pub struct Error {
   kind: ErrorKind,
-  from: Option<ErrorSource>,
+  from: ErrorSource,
 }
 
 impl Error {
   #[inline]
   pub(crate) const fn new(kind: ErrorKind) -> Self {
-    Self { kind, from: None }
+    Self {
+      kind,
+      from: ErrorSource::Ignore,
+    }
   }
 
   #[inline]
@@ -21,7 +27,7 @@ impl Error {
   {
     Self {
       kind,
-      from: Some(ErrorSource::Source(Box::new(source))),
+      from: ErrorSource::Source(Box::new(source)),
     }
   }
 
@@ -29,6 +35,30 @@ impl Error {
   #[inline]
   pub const fn kind(&self) -> ErrorKind {
     self.kind
+  }
+}
+
+impl Display for Error {
+  fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+    match self.kind {
+      ErrorKind::InvalidIO => write!(f, "i/o error: {}", self.from),
+      ErrorKind::InvalidMagic => write!(f, "invalid magic signature"),
+      ErrorKind::InvalidLen(name) => write!(f, "invalid md5 for {name}"),
+      ErrorKind::InvalidMd5(name) => write!(f, "invalid len for {name}"),
+      ErrorKind::FileInvalidSize => write!(f, "file invalid: bad size"),
+      ErrorKind::FileInvalidType => write!(f, "file invalid: bad type"),
+      ErrorKind::FileCorruptData => write!(f, "file corrupted/unreadable"),
+    }
+  }
+}
+
+impl StdError for Error {
+  #[inline]
+  fn source(&self) -> Option<&(dyn StdError + 'static)> {
+    match self.from {
+      ErrorSource::Ignore => None,
+      ErrorSource::Source(ref source) => Some(&**source),
+    }
   }
 }
 
@@ -47,13 +77,29 @@ pub enum ErrorKind {
   InvalidIO,
   InvalidMagic,
   // ===========================================================================
+  // Parse Errors (v4)
+  // ===========================================================================
+  InvalidLen(&'static str),
+  InvalidMd5(&'static str),
+  // ===========================================================================
   // File Errors
   // ===========================================================================
   FileInvalidSize,
   FileInvalidType,
+  FileCorruptData,
 }
 
 #[derive(Debug)]
 enum ErrorSource {
+  Ignore,
   Source(Box<dyn StdError + 'static>),
+}
+
+impl Display for ErrorSource {
+  fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+    match self {
+      Self::Ignore => Ok(()),
+      Self::Source(inner) => Display::fmt(inner, f),
+    }
+  }
 }
