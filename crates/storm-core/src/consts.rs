@@ -9,12 +9,16 @@ pub const BT_MASK: u32 = 0x0FFFFFFF;
 // Signatures
 // =============================================================================
 
+/// Signature for [MPQ Header][crate::types::Header].
 pub const MAGIC_ID: [u8; 4] = *b"MPQ\x1A";
 
+/// Signature for [MPQ User Data][crate::types::UserData].
 pub const MAGIC_UD: [u8; 4] = *b"MPQ\x1B";
 
+/// Signature for [HET Table][crate::types::ExtHTable].
 pub const MAGIC_HET: [u8; 4] = *b"HET\x1A";
 
+/// Signature for [BET Table][crate::types::ExtBTable].
 pub const MAGIC_BET: [u8; 4] = *b"BET\x1A";
 
 pub const MAGIC_SIGN: [u8; 4] = *b"NGIS";
