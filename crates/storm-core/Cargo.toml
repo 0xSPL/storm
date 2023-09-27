@@ -7,8 +7,3 @@ readme = "README.md"
 
 [dependencies]
 storm-utils = { version = "=0.1", path = "../storm-utils", default-features = false }
-
-[features]
-default = ["std"]
-
-std = []

@@ -1,4 +1,3 @@
-#[cfg(feature = "std")]
 use std::error::Error as StdError;
 
 pub type Result<T, E = Error> = core::result::Result<T, E>;
@@ -15,7 +14,6 @@ impl Error {
     Self { kind, from: None }
   }
 
-  #[cfg(feature = "std")]
   #[inline]
   pub(crate) fn new_std<T>(kind: ErrorKind, source: T) -> Self
   where
@@ -25,12 +23,6 @@ impl Error {
       kind,
       from: Some(ErrorSource::Source(Box::new(source))),
     }
-  }
-
-  #[cfg(not(feature = "std"))]
-  #[inline]
-  pub(crate) fn new_std<T>(kind: ErrorKind, _source: T) -> Self {
-    Self::new(kind)
   }
 
   /// Returns the corresponding [`ErrorKind`] for this error.
@@ -48,6 +40,5 @@ pub enum ErrorKind {
 
 #[derive(Debug)]
 enum ErrorSource {
-  #[cfg(feature = "std")]
   Source(Box<dyn StdError + 'static>),
 }
