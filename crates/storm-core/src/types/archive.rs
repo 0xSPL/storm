@@ -1,3 +1,7 @@
+use std::path::Path;
+
+use crate::error::Result;
+use crate::parse::read_archive;
 use crate::types::BTable;
 use crate::types::ExtBTable;
 use crate::types::ExtHTable;
@@ -78,5 +82,14 @@ impl Archive {
   #[inline]
   pub fn sector_size(&self) -> u32 {
     0x200 << self.header.sector_size_shift
+  }
+
+  /// Parse an archive from the file at the given `path`.
+  #[inline]
+  pub fn open<P>(path: &P) -> Result<Self>
+  where
+    P: AsRef<Path> + ?Sized,
+  {
+    read_archive(path)
   }
 }
