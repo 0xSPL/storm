@@ -8,9 +8,11 @@ use crate::consts::BT_MASK;
 use crate::error::Error;
 use crate::error::ErrorKind;
 use crate::error::Result;
+use crate::extract;
 use crate::types::Archive;
 use crate::types::BTable;
 use crate::types::BTableEntry;
+use crate::types::File;
 use crate::types::HTable;
 use crate::types::HTableEntry;
 use crate::types::Header;
@@ -116,13 +118,20 @@ pub struct FilePtr<'a> {
 }
 
 impl FilePtr<'_> {
-  // Returns the source offset of the file.
-  pub(crate) fn offset(&self) -> u64 {
+  /// Read file data represented by this pointer.
+  #[inline]
+  pub fn read(self) -> Result<File> {
+    extract::read_file(self)
+  }
+
+  /// Returns the source offset of the file.
+  #[inline]
+  pub fn offset(&self) -> u64 {
     self.archive.offset + u64::from(self.btentry.offset)
   }
 
-  // Computes the encryption key of the file.
-  pub(crate) fn encryption_key(&self) -> u32 {
+  /// Computes the encryption key of the file.
+  pub fn encryption_key(&self) -> u32 {
     let mut key: u32 = 0;
 
     if self.btentry.is_encrypted() {
