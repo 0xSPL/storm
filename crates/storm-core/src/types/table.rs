@@ -36,7 +36,7 @@ pub type TableIter<'a, T> = Filter<Iter<'a, T>, fn(&&T) -> bool>;
 // Generic Table
 // =============================================================================
 
-#[derive(Clone, Hash, PartialEq, Eq)]
+#[derive(Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct GenericTable<T> {
   pub(crate) data: Vec<T>,
 }
@@ -117,7 +117,7 @@ where
 /// `0x08` = `language` \
 /// `0x0A` = `platform` \
 /// `0x0C` = `position`
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct HTableEntry {
   /// The hash of the file path, using method A.
   pub hash1: u32,
@@ -188,7 +188,7 @@ impl Parse for HTableEntry {
 /// `0x04` = `comp_size` \
 /// `0x08` = `file_size` \
 /// `0x0C` = `bitflags`
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct BTableEntry {
   /// Offset of the beginning of the block, relative to the beginning of the archive.
   pub offset: u32,

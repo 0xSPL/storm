@@ -23,7 +23,7 @@ const_assert_size!(UserData, 0x10);
 /// `0x04` = `udata_size` \
 /// `0x08` = `header_offset` \
 /// `0x0C` = `udata_header_size`
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct UserData {
   /// Indicates that this is a shunt block.
   pub magic: Magic,

@@ -1,9 +1,15 @@
+mod etable;
 mod header;
 mod magic;
 mod signature;
 mod table;
 mod udata;
 
+pub use self::etable::BETHeader;
+pub use self::etable::ExtBTable;
+pub use self::etable::ExtHTable;
+pub use self::etable::ExtHeader;
+pub use self::etable::HETHeader;
 pub use self::header::Header;
 pub use self::header::HeaderV1;
 pub use self::header::HeaderV2;

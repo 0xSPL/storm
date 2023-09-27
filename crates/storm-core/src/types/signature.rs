@@ -16,13 +16,13 @@ const_assert_size!(Signature, 0x104);
 // Strong Digital Signature
 // =============================================================================
 
-/// Strong Digital Signature
+/// Strong Digital Signature.
 ///
 /// ## Layout
 ///
 /// `0x00` = `magic` \
 /// `0x04` = `signature`
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Signature {
   /// Indicates the presence of a digital signature.
   pub magic: Magic,
