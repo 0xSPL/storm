@@ -6,6 +6,7 @@ use core::ops::Deref;
 use core::str::from_utf8_unchecked;
 use storm_utils::traits::Parse;
 use storm_utils::traits::ReadExt;
+use storm_utils::utils::Hex;
 
 use crate::consts::MAGIC_BET;
 use crate::consts::MAGIC_HET;
@@ -50,6 +51,12 @@ impl Magic {
   pub const fn as_str(&self) -> &str {
     // SAFETY: We only parse valid UTF-8
     unsafe { from_utf8_unchecked(&self.0) }
+  }
+
+  /// Returns a `Hex` formatter for the magic signature.
+  #[inline]
+  pub const fn as_hex(&self) -> Hex<'_, 8> {
+    Hex::new(&self.0)
   }
 
   #[inline]
