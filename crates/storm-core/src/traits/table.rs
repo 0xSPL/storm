@@ -3,6 +3,7 @@ use storm_utils::utils::DigestMd5;
 
 use crate::consts::HASH_KEY_BT;
 use crate::consts::HASH_KEY_HT;
+use crate::error::Error;
 use crate::types::BTable;
 use crate::types::BTableEntry;
 use crate::types::HTable;
@@ -14,7 +15,7 @@ use crate::types::HeaderV4;
 // Table Entry Trait
 // =============================================================================
 
-pub trait TableEntry: Parse {
+pub trait TableEntry: Parse<Error = Error> {
   const SIZE: usize;
 
   fn is_empty(&self) -> bool;
