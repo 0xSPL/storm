@@ -72,6 +72,46 @@ impl HeaderV4 {
 
   /// The size of a V4 header.
   pub const SIZE: usize = size_of::<Self>() - Self::RUST_PAD;
+
+  /// Returns the MD5 digest of the header.
+  pub fn digest(&self) -> DigestMd5 {
+    DigestMd5::build(|hasher| {
+      // V1 Fields
+      hasher.update(self.magic);
+      hasher.update(self.header_size.to_le_bytes());
+      hasher.update(self.archive_size.to_le_bytes());
+      hasher.update(self.format_version.to_le_bytes());
+      hasher.update([self.sector_size_shift]);
+      hasher.update([self._padding]);
+      hasher.update(self.htable_offset.to_le_bytes());
+      hasher.update(self.btable_offset.to_le_bytes());
+      hasher.update(self.htable_entries.to_le_bytes());
+      hasher.update(self.btable_entries.to_le_bytes());
+
+      // V2 Fields
+      hasher.update(self.hi_btable_offset.to_le_bytes());
+      hasher.update(self.htable_offset_hi.to_le_bytes());
+      hasher.update(self.btable_offset_hi.to_le_bytes());
+
+      // V3 Fields
+      hasher.update(self.archive_size_64.to_le_bytes());
+      hasher.update(self.bet_table_position.to_le_bytes());
+      hasher.update(self.het_table_position.to_le_bytes());
+
+      // V4 Fields
+      hasher.update(self.htable_size.to_le_bytes());
+      hasher.update(self.btable_size.to_le_bytes());
+      hasher.update(self.hi_btable_size.to_le_bytes());
+      hasher.update(self.het_table_size.to_le_bytes());
+      hasher.update(self.bet_table_size.to_le_bytes());
+      hasher.update(self.raw_chunk_size.to_le_bytes());
+      hasher.update(self.md5_btable);
+      hasher.update(self.md5_htable);
+      hasher.update(self.md5_hi_btable);
+      hasher.update(self.md5_bet_table);
+      hasher.update(self.md5_het_table);
+    })
+  }
 }
 
 impl Deref for HeaderV4 {
