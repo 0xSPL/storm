@@ -4,6 +4,8 @@ use core::fmt::Formatter;
 use core::fmt::Result as FmtResult;
 use core::ops::Deref;
 use core::ops::DerefMut;
+use md5::Digest as _;
+use md5::Md5;
 
 use crate::consts::MD5_DIGEST_SIZE;
 use crate::utils::Hex;
@@ -34,6 +36,24 @@ impl<const S: usize> Digest<S> {
   #[inline]
   pub const fn as_slice(&self) -> &[u8] {
     self.0.as_slice()
+  }
+}
+
+impl DigestMd5 {
+  /// Create a new `DigestMd5` from the given `data`.
+  #[inline]
+  pub fn new(input: &[u8]) -> Self {
+    Self::build(|hasher| hasher.update(input))
+  }
+
+  pub fn build(f: impl Fn(&mut Hasher<Md5>)) -> Self {
+    let mut hasher: Md5 = Md5::new();
+    let mut output: Self = Self::empty();
+
+    f(&mut Hasher::new(&mut hasher));
+
+    hasher.finalize_into((&mut output[..]).into());
+    output
   }
 }
 
@@ -76,5 +96,27 @@ impl<const S: usize> From<[u8; S]> for Digest<S> {
   #[inline]
   fn from(other: [u8; S]) -> Self {
     Self(other)
+  }
+}
+
+// =============================================================================
+// Hasher
+// =============================================================================
+
+pub struct Hasher<'a, D> {
+  hasher: &'a mut D,
+}
+
+impl<'a, D: md5::Digest> Hasher<'a, D> {
+  /// Create a new `Hasher`.
+  #[inline]
+  pub fn new(hasher: &'a mut D) -> Self {
+    Self { hasher }
+  }
+
+  /// Update the hasher state with the given `data`.
+  #[inline]
+  pub fn update(&mut self, data: impl AsRef<[u8]>) {
+    self.hasher.update(data);
   }
 }
