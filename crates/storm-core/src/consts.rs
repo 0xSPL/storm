@@ -21,6 +21,7 @@ pub const MAGIC_HET: [u8; 4] = *b"HET\x1A";
 /// Signature for [BET Table][crate::types::ExtBTable].
 pub const MAGIC_BET: [u8; 4] = *b"BET\x1A";
 
+/// Signature for [`strong digital signature`][crate::types::Signature].
 pub const MAGIC_SIGN: [u8; 4] = *b"NGIS";
 
 // =============================================================================
