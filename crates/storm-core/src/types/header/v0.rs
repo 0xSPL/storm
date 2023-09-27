@@ -30,6 +30,7 @@ impl Header {
   pub const VER4: u16 = consts::V4;
 
   /// Returns the internal size of the header.
+  #[inline]
   pub const fn size(&self) -> usize {
     match self {
       Self::V1(_) => HeaderV1::SIZE,
@@ -39,27 +40,32 @@ impl Header {
     }
   }
 
-  // Returns `true` if this is a V1 header.
+  /// Returns `true` if this is a V1 header.
+  #[inline]
   pub const fn is_v1(&self) -> bool {
     matches!(self, Self::V1(_))
   }
 
-  // Returns `true` if this is a V2 header.
+  /// Returns `true` if this is a V2 header.
+  #[inline]
   pub const fn is_v2(&self) -> bool {
     matches!(self, Self::V2(_))
   }
 
-  // Returns `true` if this is a V3 header.
+  /// Returns `true` if this is a V3 header.
+  #[inline]
   pub const fn is_v3(&self) -> bool {
     matches!(self, Self::V3(_))
   }
 
-  // Returns `true` if this is a V4 header.
+  /// Returns `true` if this is a V4 header.
+  #[inline]
   pub const fn is_v4(&self) -> bool {
     matches!(self, Self::V4(_))
   }
 
   /// Returns a reference to the the V1 header.
+  #[inline]
   pub const fn v1(&self) -> &HeaderV1 {
     match self {
       Self::V1(header) => header,
@@ -70,6 +76,7 @@ impl Header {
   }
 
   /// Returns a reference to the the V2 header.
+  #[inline]
   pub const fn v2(&self) -> Option<&HeaderV2> {
     match self {
       Self::V1(_) => None,
@@ -80,6 +87,7 @@ impl Header {
   }
 
   /// Returns a reference to the the V3 header.
+  #[inline]
   pub const fn v3(&self) -> Option<&HeaderV3> {
     match self {
       Self::V1(_) => None,
@@ -90,6 +98,7 @@ impl Header {
   }
 
   /// Returns a reference to the the V4 header.
+  #[inline]
   pub const fn v4(&self) -> Option<&HeaderV4> {
     match self {
       Self::V1(_) => None,

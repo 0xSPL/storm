@@ -176,7 +176,7 @@ where
 /// `0x20` = `index_size_extra` \
 /// `0x24` = `index_size` \
 /// `0x28` = `index_table_size`
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ExtHTable {
   /// Base header.
   pub header: HETHeader,
@@ -249,7 +249,7 @@ impl ParseContext<HETHeader> for ExtHTable {
 /// `0x4C` = `bc_name_hash_2` \
 /// `0x50` = `name_hash_array_size` \
 /// `0x54` = `flag_count`
-#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ExtBTable {
   /// Base header.
   pub header: BETHeader,

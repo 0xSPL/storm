@@ -1,3 +1,4 @@
+mod archive;
 mod etable;
 mod header;
 mod magic;
@@ -5,6 +6,7 @@ mod signature;
 mod table;
 mod udata;
 
+pub use self::archive::Archive;
 pub use self::etable::BETHeader;
 pub use self::etable::ExtBTable;
 pub use self::etable::ExtHTable;

@@ -155,6 +155,7 @@ impl HTableEntry {
   pub const EMPTY_REMOVED: u32 = 0xFFFFFFFE;
 
   /// Returns `true` if the hash table entry is empty.
+  #[inline]
   pub const fn is_empty(&self) -> bool {
     self.position == Self::EMPTY_FOREVER || self.position == Self::EMPTY_REMOVED
   }
@@ -208,6 +209,7 @@ impl BTableEntry {
   pub const SIZE: usize = size_of::<Self>();
 
   /// Returns `true` if the block table entry is empty (not a file).
+  #[inline]
   pub const fn is_empty(&self) -> bool {
     self.file_size == 0 && self.bitflags.is_empty()
   }
