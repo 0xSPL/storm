@@ -1,6 +1,8 @@
 use std::path::Path;
 
 use crate::error::Result;
+use crate::extract::find_file;
+use crate::extract::FilePtr;
 use crate::parse::read_archive;
 use crate::parse::Handle;
 use crate::types::BTable;
@@ -94,5 +96,11 @@ impl Archive {
     P: AsRef<Path> + ?Sized,
   {
     read_archive(path)
+  }
+
+  /// Search the archive for a file with the given `name`.
+  #[inline]
+  pub fn find_file<'a>(&'a self, name: &'a str) -> Result<FilePtr<'a>> {
+    find_file(self, name)
   }
 }

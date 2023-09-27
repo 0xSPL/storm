@@ -48,6 +48,7 @@ impl Display for Error {
       ErrorKind::FileInvalidSize => write!(f, "file invalid: bad size"),
       ErrorKind::FileInvalidType => write!(f, "file invalid: bad type"),
       ErrorKind::FileCorruptData => write!(f, "file corrupted/unreadable"),
+      ErrorKind::FileDataMissing => write!(f, "file not found"),
     }
   }
 }
@@ -87,6 +88,7 @@ pub enum ErrorKind {
   FileInvalidSize,
   FileInvalidType,
   FileCorruptData,
+  FileDataMissing,
 }
 
 #[derive(Debug)]
