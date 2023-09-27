@@ -61,6 +61,9 @@ impl Display for Error {
       ErrorKind::DecompressionFailure => {
         write!(f, "decompression failed: {}", self.from)
       }
+      ErrorKind::DecompressionStatus(status) => {
+        write!(f, "decompression failed: {status}")
+      }
     }
   }
 }
@@ -108,6 +111,7 @@ pub enum ErrorKind {
   DecompressionFeature(&'static str, &'static str),
   DecompressionNoBytes,
   DecompressionFailure,
+  DecompressionStatus(&'static str),
 }
 
 #[derive(Debug)]

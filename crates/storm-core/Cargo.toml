@@ -10,6 +10,10 @@ readme = "README.md"
 byteorder = { version = "1.4", default-features = false, features = ["std"] }
 storm-utils = { version = "=0.1", path = "../storm-utils", default-features = false }
 
+# Compression
+bzip2 = { version = "0.4", default-features = false, optional = true }
+flate2 = { version = "1.0", default-features = false, optional = true, features = ["rust_backend"] }
+
 [features]
 default = []
 
@@ -17,7 +21,7 @@ default = []
 adpcm = []
 
 # Enables BZip2 Compression
-bzip2 = []
+bzip2 = ["dep:bzip2"]
 
 # Enables Huffman Coding Compression
 huffman = []
@@ -29,4 +33,4 @@ pkware = []
 sparse = []
 
 # Enables ZLib Compression
-zlib = []
+zlib = ["dep:flate2"]

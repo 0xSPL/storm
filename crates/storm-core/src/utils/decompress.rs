@@ -82,7 +82,26 @@ pub fn decompress_huffman(_buffer: &[u8], _output: &mut [u8]) -> Result<usize> {
 
 #[cfg(feature = "zlib")]
 pub fn decompress_zlib(buffer: &[u8], output: &mut [u8]) -> Result<usize> {
-  panic!("decompress_zlib");
+  const fn translate(status: flate2::Status) -> &'static str {
+    match status {
+      flate2::Status::Ok => "More output to be written but the output buffer is full.",
+      flate2::Status::BufError => "The output buffer isn’t large enough to contain the result.",
+      flate2::Status::StreamEnd => unreachable!(),
+    }
+  }
+
+  let mut stream: flate2::Decompress = flate2::Decompress::new(true);
+  let mode: flate2::FlushDecompress = flate2::FlushDecompress::Finish;
+
+  let status: flate2::Status = stream
+    .decompress(buffer, output, mode)
+    .map_err(|error| Error::new_std(ErrorKind::DecompressionFailure, error))?;
+
+  if let flate2::Status::StreamEnd = status {
+    Ok(stream.total_out() as usize)
+  } else {
+    Err(Error::new(ErrorKind::DecompressionStatus(translate(status))))
+  }
 }
 
 #[cfg(not(feature = "zlib"))]
@@ -110,7 +129,28 @@ pub fn decompress_pkware(_buffer: &[u8], _output: &mut [u8]) -> Result<usize> {
 
 #[cfg(feature = "bzip2")]
 pub fn decompress_bzip2(buffer: &[u8], output: &mut [u8]) -> Result<usize> {
-  panic!("decompress_bzip2");
+  const fn translate(status: bzip2::Status) -> &'static str {
+    match status {
+      bzip2::Status::Ok => unreachable!(),
+      bzip2::Status::FlushOk => "The flush action went ok.",
+      bzip2::Status::RunOk => "The run action went ok.",
+      bzip2::Status::FinishOk => "The finish action went ok.",
+      bzip2::Status::StreamEnd => unreachable!(),
+      bzip2::Status::MemNeeded => "Insufficient memory in the input or output buffer.",
+    }
+  }
+
+  let mut stream: bzip2::Decompress = bzip2::Decompress::new(false);
+
+  let status: bzip2::Status = stream
+    .decompress(buffer, output)
+    .map_err(|error| Error::new_std(ErrorKind::DecompressionFailure, error))?;
+
+  if let bzip2::Status::Ok | bzip2::Status::StreamEnd = status {
+    Ok(stream.total_out() as usize)
+  } else {
+    Err(Error::new(ErrorKind::DecompressionStatus(translate(status))))
+  }
 }
 
 #[cfg(not(feature = "bzip2"))]
