@@ -5,6 +5,11 @@ use std::io::Read;
 use std::io::Result;
 
 pub trait ReadExt: Read {
+  #[inline]
+  fn read_bytes(&mut self, buffer: &mut [u8]) -> Result<()> {
+    <Self as Read>::read_exact(self, buffer)
+  }
+
   // ===========================================================================
   // Integer Readers
   // ===========================================================================
