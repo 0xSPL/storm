@@ -2,7 +2,6 @@ use core::mem::size_of;
 use storm_utils::traits::ParseContext;
 use storm_utils::traits::ReadExt;
 
-use crate::consts::MAGIC_UD;
 use crate::error::Error;
 use crate::types::Magic;
 
@@ -50,9 +49,9 @@ impl UserData {
 impl ParseContext<Magic> for UserData {
   type Error = Error;
 
-  /// Reads a user data block from the given `reader`.
+  /// Parse a user data block from the given `reader`.
   fn from_reader<R: ReadExt>(context: Magic, reader: &mut R) -> Result<Self, Self::Error> {
-    debug_assert!(context.as_ref() == MAGIC_UD);
+    debug_assert_eq!(context, Magic::UD);
 
     Ok(Self {
       magic: context,

@@ -163,7 +163,7 @@ impl HTableEntry {
 impl Parse for HTableEntry {
   type Error = Error;
 
-  /// Reads a hash table entry from the given `reader`.
+  /// Parse a hash table entry from the given `reader`.
   fn from_reader<R: ReadExt>(reader: &mut R) -> Result<Self, Self::Error> {
     Ok(Self {
       hash1: reader.read_u32_le()?,
@@ -282,7 +282,7 @@ impl BTableEntry {
 impl Parse for BTableEntry {
   type Error = Error;
 
-  /// Reads a block table entry from the given `reader`.
+  /// Parse a block table entry from the given `reader`.
   fn from_reader<R: ReadExt>(reader: &mut R) -> Result<Self, Self::Error> {
     Ok(Self {
       offset: reader.read_u32_le()?,

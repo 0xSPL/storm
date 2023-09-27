@@ -3,7 +3,6 @@ use storm_utils::traits::ParseContext;
 use storm_utils::traits::ReadExt;
 
 use crate::consts::BT_MASK;
-use crate::consts::MAGIC_ID;
 use crate::error::Error;
 use crate::types::Magic;
 
@@ -75,7 +74,7 @@ impl ParseContext<Magic> for HeaderV1 {
 
   /// Parse a V1 header from the given `reader`.
   fn from_reader<R: ReadExt>(context: Magic, reader: &mut R) -> Result<Self, Self::Error> {
-    debug_assert!(context.as_ref() == MAGIC_ID);
+    debug_assert_eq!(context, Magic::ID);
 
     Ok(Self {
       magic: context,
