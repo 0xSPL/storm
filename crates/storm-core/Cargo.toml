@@ -6,4 +6,5 @@ license = "MIT OR Apache-2.0"
 readme = "README.md"
 
 [dependencies]
+byteorder = { version = "1.4", default-features = false, features = ["std"] }
 storm-utils = { version = "=0.1", path = "../storm-utils", default-features = false }
