@@ -32,6 +32,13 @@ impl Error {
   }
 }
 
+impl From<std::io::Error> for Error {
+  #[inline]
+  fn from(other: std::io::Error) -> Self {
+    Self::new_std(ErrorKind::InvalidIO, other)
+  }
+}
+
 #[derive(Clone, Copy, Debug)]
 pub enum ErrorKind {
   InvalidIO,

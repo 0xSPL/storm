@@ -93,9 +93,7 @@ impl Parse for Magic {
   type Error = Error;
 
   fn from_reader<R: ReadExt>(reader: &mut R) -> Result<Self, Self::Error> {
-    let magic: [u8; 4] = reader
-      .read_array_u8()
-      .map_err(|error| Error::new_std(ErrorKind::InvalidIO, error))?;
+    let magic: [u8; 4] = reader.read_array_u8()?;
 
     if Self::known(magic) {
       // SAFETY: Well-known magic is valid UTF-8.
