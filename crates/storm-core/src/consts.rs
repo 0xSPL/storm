@@ -34,3 +34,13 @@ pub const V3: u16 = 0x0002;
 
 /// WoW Cataclysm.
 pub const V4: u16 = 0x0003;
+
+// =============================================================================
+// Hashing
+// =============================================================================
+
+/// Hash Key: `hash("(hash table)", HashType::File)`.
+pub const HASH_KEY_HT: u32 = 0xC3AF3770;
+
+/// Hash Key: `hash("(block table)", HashType::File)`.
+pub const HASH_KEY_BT: u32 = 0xEC83B3A3;
