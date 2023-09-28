@@ -65,3 +65,15 @@ impl Parse for Dependencies {
     Ok(this)
   }
 }
+
+only_serde! {
+  use serde::Serialize;
+  use serde::Serializer;
+
+  impl Serialize for Dependencies {
+    #[inline]
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      (**self).serialize(serializer)
+    }
+  }
+}

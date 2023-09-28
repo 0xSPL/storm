@@ -3,8 +3,8 @@ use storm_core::types::Magic;
 use storm_utils::traits::Parse;
 use storm_utils::traits::ReadExt;
 
-use crate::document::Dependencies;
 use crate::document::Attributes;
+use crate::document::Dependencies;
 
 // =============================================================================
 // Document Header
@@ -49,5 +49,20 @@ impl Parse for DocumentHeader {
       dependencies,
       attributes,
     })
+  }
+}
+
+only_serde! {
+  use serde::ser::SerializeStruct;
+  use serde::Serialize;
+  use serde::Serializer;
+
+  impl Serialize for DocumentHeader {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      let mut state: S::SerializeStruct = serializer.serialize_struct("DocumentHeader", 2)?;
+      state.serialize_field("dependencies", self.dependencies())?;
+      state.serialize_field("attributes", self.attributes())?;
+      state.end()
+    }
   }
 }

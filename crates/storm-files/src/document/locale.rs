@@ -59,3 +59,15 @@ impl Parse for Locale {
     })
   }
 }
+
+only_serde! {
+  use serde::Serialize;
+  use serde::Serializer;
+
+  impl Serialize for Locale {
+    #[inline]
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      self.as_str().serialize(serializer)
+    }
+  }
+}

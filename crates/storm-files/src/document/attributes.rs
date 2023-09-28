@@ -82,3 +82,15 @@ impl Parse for Attributes {
     Ok(this)
   }
 }
+
+only_serde! {
+  use serde::Serialize;
+  use serde::Serializer;
+
+  impl Serialize for Attributes {
+    #[inline]
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      (**self).serialize(serializer)
+    }
+  }
+}

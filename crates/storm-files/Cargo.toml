@@ -10,3 +10,12 @@ readme = "README.md"
 image = { version = "0.24", default-features = false, features = ["dds", "png"] }
 storm-core = { version = "=0.1", path = "../storm-core", default-features = false }
 storm-utils = { version = "=0.1", path = "../storm-utils", default-features = false }
+
+# Serialization
+serde = { version = "1.0", default-features = false, optional = true, features = ["std"] }
+
+[features]
+default = []
+
+# Enables serde support
+serde = ["dep:serde"]
