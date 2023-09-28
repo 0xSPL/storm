@@ -18,9 +18,7 @@ impl Hex {
   #[inline]
   pub const fn from_slice(data: &[u8]) -> &Self {
     // SAFETY: Hex is `repr(transparent)` and borrowed from `data`.
-    unsafe {
-      &*(data as *const [u8] as *const Self)
-    }
+    unsafe { &*(data as *const [u8] as *const Self) }
   }
 }
 
@@ -28,12 +26,7 @@ impl<T> Hex<T>
 where
   T: AsRef<[u8]> + ?Sized,
 {
-  fn write<W>(
-    &self,
-    writer: &mut W,
-    pretty: bool,
-    alphabet: &'static [u8; 16],
-  ) -> FmtResult
+  fn write<W>(&self, writer: &mut W, pretty: bool, alphabet: &'static [u8; 16]) -> FmtResult
   where
     W: Write,
   {
