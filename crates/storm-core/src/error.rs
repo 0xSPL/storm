@@ -22,8 +22,9 @@ impl Error {
     }
   }
 
+  #[doc(hidden)]
   #[inline]
-  pub(crate) fn new_std<T>(kind: ErrorKind, source: T) -> Self
+  pub fn new_std<T>(kind: ErrorKind, source: T) -> Self
   where
     T: StdError + 'static,
   {
@@ -72,6 +73,9 @@ impl Display for Error {
       ErrorKind::DecompressionStatus(status) => {
         write!(f, "decompression failed: {status}")
       }
+      ErrorKind::Other => {
+        write!(f, "{}", self.from)
+      }
     }
   }
 }
@@ -90,6 +94,20 @@ impl From<std::io::Error> for Error {
   #[inline]
   fn from(other: std::io::Error) -> Self {
     Self::new_std(ErrorKind::InvalidIO, other)
+  }
+}
+
+impl From<std::string::FromUtf8Error> for Error {
+  #[inline]
+  fn from(other: std::string::FromUtf8Error) -> Self {
+    Self::new_std(ErrorKind::InvalidUtf8, other)
+  }
+}
+
+impl From<std::str::Utf8Error> for Error {
+  #[inline]
+  fn from(other: std::str::Utf8Error) -> Self {
+    Self::new_std(ErrorKind::InvalidUtf8, other)
   }
 }
 
@@ -121,6 +139,10 @@ pub enum ErrorKind {
   DecompressionNoBytes,
   DecompressionFailure,
   DecompressionStatus(&'static str),
+  // ===========================================================================
+  // Misc.
+  // ===========================================================================
+  Other,
 }
 
 #[derive(Debug)]

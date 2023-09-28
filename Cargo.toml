@@ -9,6 +9,7 @@ readme = "README.md"
 members = [
   "crates/storm-adpcm",
   "crates/storm-core",
+  "crates/storm-files",
   "crates/storm-huffman",
   "crates/storm-pklib",
   "crates/storm-sparse",

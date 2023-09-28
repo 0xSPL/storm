@@ -8,8 +8,6 @@ use core::ops::Deref;
 use core::slice::Split;
 use core::str::from_utf8;
 
-use crate::error::Error;
-use crate::error::ErrorKind;
 use crate::error::Result;
 use crate::types::File;
 
@@ -102,7 +100,7 @@ impl<'a> ListEntry<'a> {
   /// Convert the entry to a UTF-8 string slice.
   #[inline]
   pub fn as_utf8(&self) -> Result<&'a str> {
-    from_utf8(self.0).map_err(|error| Error::new_std(ErrorKind::InvalidUtf8, error))
+    from_utf8(self.0).map_err(Into::into)
   }
 }
 

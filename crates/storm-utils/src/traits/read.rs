@@ -13,6 +13,14 @@ pub trait ReadExt: Read {
     <Self as Read>::read_exact(self, buffer)
   }
 
+  fn read_all(&mut self, capacity: usize) -> io::Result<Vec<u8>> {
+    let mut data: Vec<u8> = Vec::with_capacity(capacity);
+
+    <Self as Read>::read_to_end(self, &mut data)?;
+
+    Ok(data)
+  }
+
   // ===========================================================================
   // Parse Ext.
   // ===========================================================================
