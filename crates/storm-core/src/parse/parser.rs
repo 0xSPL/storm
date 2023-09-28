@@ -53,6 +53,18 @@ where
 // Parse Buffer
 // =============================================================================
 
+// General Archive Layout
+// - MPQ User Data
+// - MPQ Header
+// - Archive Files
+// - Special Files
+// - HET Table
+// - BET Table
+// - Hash Table
+// - Block Table
+// - Hi-Block Table
+// - Signature
+
 #[derive(Debug)]
 struct Buffer {
   offset: u64,             // current position in the reader

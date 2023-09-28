@@ -5,11 +5,14 @@ use crate::extract::find_file;
 use crate::extract::FilePtr;
 use crate::parse::read_archive;
 use crate::parse::Handle;
+use crate::types::AttrFile;
 use crate::types::BTable;
 use crate::types::ExtBTable;
 use crate::types::ExtHTable;
+use crate::types::File;
 use crate::types::HTable;
 use crate::types::Header;
+use crate::types::ListFile;
 use crate::types::Signature;
 use crate::types::UserData;
 
@@ -102,5 +105,37 @@ impl Archive {
   #[inline]
   pub fn find_file<'a>(&'a self, name: &'a str) -> Result<FilePtr<'a>> {
     find_file(self, name)
+  }
+
+  /// Find and load a file with the given `name`.
+  pub fn load_file(&self, name: &str) -> Result<File> {
+    self.find_file(name).and_then(FilePtr::read)
+  }
+
+  /// Load the `(listfile)` from the archive.
+  pub fn load_listfile(&self) -> Result<ListFile> {
+    let data: File = self.load_file("(listfile)")?;
+    let file: ListFile = ListFile::new(data);
+
+    Ok(file)
+  }
+
+  /// Load the `(attributes)` from the archive.
+  pub fn load_attributes(&self) -> Result<AttrFile> {
+    let size: u32 = self.header.btable_entries;
+    let data: File = self.load_file("(attributes)")?;
+    let file: AttrFile = AttrFile::new(data, size)?;
+
+    Ok(file)
+  }
+
+  /// Load the `(signature)` from the archive.
+  pub fn load_signature(&self) -> Result<File> {
+    self.load_file("(signature)")
+  }
+
+  /// Load the `(user data)` from the archive.
+  pub fn load_user_data(&self) -> Result<File> {
+    self.load_file("(user data)")
   }
 }
