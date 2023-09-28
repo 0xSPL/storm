@@ -1,6 +1,7 @@
 mod decompress;
 mod decrypt;
 mod hash;
+mod time;
 
 pub use self::decompress::decompress;
 pub use self::decompress::decompress_adpcm;
@@ -13,3 +14,4 @@ pub use self::decompress::CompressionFormat;
 pub use self::decrypt::decrypt;
 pub use self::hash::hash;
 pub use self::hash::HashType;
+pub use self::time::convert_filetime;

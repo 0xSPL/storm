@@ -53,6 +53,9 @@ pub const HASH_KEY_HT: u32 = 0xC3AF3770;
 /// Hash Key: `hash("(block table)", HashType::File)`.
 pub const HASH_KEY_BT: u32 = 0xEC83B3A3;
 
+/// Hash Key: `hash("(listfile)", HashType::Table)`.
+pub const HASH_KEY_LF: u32 = 0x5F3DE859;
+
 // =============================================================================
 // Compression
 // =============================================================================

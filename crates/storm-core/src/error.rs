@@ -44,6 +44,7 @@ impl Display for Error {
   fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
     match self.kind {
       ErrorKind::InvalidIO => write!(f, "i/o error: {}", self.from),
+      ErrorKind::InvalidUtf8 => write!(f, "invalid utf8: {}", self.from),
       ErrorKind::InvalidMagic => write!(f, "invalid magic signature"),
       ErrorKind::InvalidLen(name) => write!(f, "invalid md5 for {name}"),
       ErrorKind::InvalidMd5(name) => write!(f, "invalid len for {name}"),
@@ -98,6 +99,7 @@ pub enum ErrorKind {
   // Parse Errors
   // ===========================================================================
   InvalidIO,
+  InvalidUtf8,
   InvalidMagic,
   // ===========================================================================
   // Parse Errors (v4)
