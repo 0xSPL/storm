@@ -142,8 +142,8 @@ where
   type Error = Error;
 
   /// Parse an extended table header from the given `reader`.
-  fn from_reader<R: ReadExt>(reader: &mut R) -> Result<Self, Self::Error> {
-    let magic: Magic = Magic::from_reader(reader)?;
+  fn from_reader<R: ReadExt + ?Sized>(reader: &mut R) -> Result<Self, Self::Error> {
+    let magic: Magic = reader.parse()?;
 
     // Ensure the header signature is correct
     if magic != M::MAGIC {
@@ -207,7 +207,10 @@ impl ParseContext<HETHeader> for ExtHTable {
   type Error = Error;
 
   /// Parse an extended hash table from the given `reader`.
-  fn from_reader<R: ReadExt>(context: HETHeader, reader: &mut R) -> Result<Self, Self::Error> {
+  fn from_reader<R: ReadExt + ?Sized>(
+    context: HETHeader,
+    reader: &mut R,
+  ) -> Result<Self, Self::Error> {
     debug_assert_eq!(context.magic, Magic::HET);
 
     Ok(Self {
@@ -302,7 +305,10 @@ impl ParseContext<BETHeader> for ExtBTable {
   type Error = Error;
 
   /// Parse an extended block table from the given `reader`.
-  fn from_reader<R: ReadExt>(context: BETHeader, reader: &mut R) -> Result<Self, Self::Error> {
+  fn from_reader<R: ReadExt + ?Sized>(
+    context: BETHeader,
+    reader: &mut R,
+  ) -> Result<Self, Self::Error> {
     debug_assert_eq!(context.magic, Magic::BET);
 
     Ok(Self {

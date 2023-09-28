@@ -56,7 +56,10 @@ impl ParseContext<HeaderV1> for HeaderV2 {
   type Error = Error;
 
   /// Parse a V2 header from the given `reader`.
-  fn from_reader<R: ReadExt>(context: HeaderV1, reader: &mut R) -> Result<Self, Self::Error> {
+  fn from_reader<R: ReadExt + ?Sized>(
+    context: HeaderV1,
+    reader: &mut R,
+  ) -> Result<Self, Self::Error> {
     Ok(Self {
       v1: context,
       hi_btable_offset: reader.read_u64_le()?,

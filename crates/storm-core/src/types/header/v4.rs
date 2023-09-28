@@ -127,8 +127,11 @@ impl ParseContext<HeaderV1> for HeaderV4 {
   type Error = Error;
 
   /// Parse a V4 header from the given `reader`.
-  fn from_reader<R: ReadExt>(context: HeaderV1, reader: &mut R) -> Result<Self, Self::Error> {
-    HeaderV2::from_reader(context, reader).and_then(|context| Self::from_reader(context, reader))
+  fn from_reader<R: ReadExt + ?Sized>(
+    context: HeaderV1,
+    reader: &mut R,
+  ) -> Result<Self, Self::Error> {
+    HeaderV2::from_reader(context, reader).and_then(|context| reader.parse_context(context))
   }
 }
 
@@ -136,8 +139,11 @@ impl ParseContext<HeaderV2> for HeaderV4 {
   type Error = Error;
 
   /// Parse a V4 header from the given `reader`.
-  fn from_reader<R: ReadExt>(context: HeaderV2, reader: &mut R) -> Result<Self, Self::Error> {
-    HeaderV3::from_reader(context, reader).and_then(|context| Self::from_reader(context, reader))
+  fn from_reader<R: ReadExt + ?Sized>(
+    context: HeaderV2,
+    reader: &mut R,
+  ) -> Result<Self, Self::Error> {
+    HeaderV3::from_reader(context, reader).and_then(|context| reader.parse_context(context))
   }
 }
 
@@ -145,7 +151,10 @@ impl ParseContext<HeaderV3> for HeaderV4 {
   type Error = Error;
 
   /// Parse a V4 header from the given `reader`.
-  fn from_reader<R: ReadExt>(context: HeaderV3, reader: &mut R) -> Result<Self, Self::Error> {
+  fn from_reader<R: ReadExt + ?Sized>(
+    context: HeaderV3,
+    reader: &mut R,
+  ) -> Result<Self, Self::Error> {
     Ok(Self {
       v3: context,
       htable_size: reader.read_u64_le()?,

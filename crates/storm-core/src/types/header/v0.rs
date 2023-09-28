@@ -122,23 +122,16 @@ impl ParseContext<Magic> for Header {
   type Error = Error;
 
   /// Parse header from the given `reader`.
-  fn from_reader<R: ReadExt>(context: Magic, reader: &mut R) -> Result<Self, Self::Error> {
-    let v1: HeaderV1 = HeaderV1::from_reader(context, reader)?;
+  fn from_reader<R: ReadExt + ?Sized>(context: Magic, reader: &mut R) -> Result<Self, Self::Error> {
+    let v1: HeaderV1 = reader.parse_context(context)?;
 
     // Parse more fields, depending on the version
     match v1.format_version {
       Self::VER1 => Ok(Self::V1(v1)),
-      Self::VER2 => HeaderV2::from_reader(v1, reader).map(Self::V2),
-      Self::VER3 => HeaderV2::from_reader(v1, reader)
-        .and_then(|v2| HeaderV3::from_reader(v2, reader))
-        .map(Self::V3),
-      Self::VER4 => HeaderV2::from_reader(v1, reader)
-        .and_then(|v2| HeaderV3::from_reader(v2, reader))
-        .and_then(|v2| HeaderV4::from_reader(v2, reader))
-        .map(Self::V4),
-      _ => {
-        panic!("Handle Unknown Version");
-      }
+      Self::VER2 => reader.parse_context(v1).map(Self::V2),
+      Self::VER3 => reader.parse_context(v1).map(Self::V3),
+      Self::VER4 => reader.parse_context(v1).map(Self::V4),
+      _ => panic!("Handle Unknown Version"),
     }
   }
 }

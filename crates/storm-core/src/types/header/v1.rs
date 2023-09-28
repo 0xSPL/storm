@@ -73,7 +73,7 @@ impl ParseContext<Magic> for HeaderV1 {
   type Error = Error;
 
   /// Parse a V1 header from the given `reader`.
-  fn from_reader<R: ReadExt>(context: Magic, reader: &mut R) -> Result<Self, Self::Error> {
+  fn from_reader<R: ReadExt + ?Sized>(context: Magic, reader: &mut R) -> Result<Self, Self::Error> {
     debug_assert_eq!(context, Magic::ID);
 
     Ok(Self {

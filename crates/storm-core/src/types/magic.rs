@@ -100,7 +100,7 @@ impl Parse for Magic {
   type Error = Error;
 
   /// Parse a magic signature from the given `reader`.
-  fn from_reader<R: ReadExt>(reader: &mut R) -> Result<Self, Self::Error> {
+  fn from_reader<R: ReadExt + ?Sized>(reader: &mut R) -> Result<Self, Self::Error> {
     let magic: [u8; 4] = reader.read_array_u8()?;
 
     if Self::known(magic) {

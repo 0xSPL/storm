@@ -39,7 +39,7 @@ impl ParseContext<Magic> for Signature {
   type Error = Error;
 
   /// Parse a strong digital signature from the given `reader`.
-  fn from_reader<R: ReadExt>(context: Magic, reader: &mut R) -> Result<Self, Self::Error> {
+  fn from_reader<R: ReadExt + ?Sized>(context: Magic, reader: &mut R) -> Result<Self, Self::Error> {
     debug_assert_eq!(context, Magic::SIGN);
 
     Ok(Self {

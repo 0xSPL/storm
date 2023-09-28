@@ -50,7 +50,7 @@ impl ParseContext<Magic> for UserData {
   type Error = Error;
 
   /// Parse a user data block from the given `reader`.
-  fn from_reader<R: ReadExt>(context: Magic, reader: &mut R) -> Result<Self, Self::Error> {
+  fn from_reader<R: ReadExt + ?Sized>(context: Magic, reader: &mut R) -> Result<Self, Self::Error> {
     debug_assert_eq!(context, Magic::UD);
 
     Ok(Self {

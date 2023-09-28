@@ -155,14 +155,14 @@ impl Buffer {
       }
 
       if self.found || self.magic == MAGIC_ID {
-        return Header::from_reader(Magic::ID, &mut self.reader);
+        return self.reader.parse_context(Magic::ID);
       } else if self.magic == MAGIC_UD {
         if self.found {
           eprintln!("[warning]: Multiple User Data Blocks");
         }
 
         // Parse user data block
-        let udata: UserData = UserData::from_reader(Magic::UD, &mut self.reader)?;
+        let udata: UserData = self.reader.parse_context(Magic::UD)?;
 
         // Sanity Checks
         assert!(udata.udata_header_size <= udata.udata_size);
@@ -288,7 +288,7 @@ impl Buffer {
     self.reader.read_bytes(&mut self.magic)?;
 
     if self.magic == MAGIC_SIGN {
-      Ok(Some(Signature::from_reader(Magic::SIGN, &mut self.reader)?))
+      Ok(Some(self.reader.parse_context(Magic::SIGN)?))
     } else {
       Ok(None)
     }
