@@ -27,8 +27,7 @@ impl<const S: usize> Digest<S> {
 
   /// Returns a `Hex` formatter for the digest.
   #[inline]
-  pub const fn as_hex(&self) -> Hex<'_, S> {
-    // TODO: S * 2
+  pub const fn as_hex(&self) -> Hex<'_> {
     Hex::new(&self.0)
   }
 
@@ -96,6 +95,14 @@ impl<const S: usize> From<[u8; S]> for Digest<S> {
   #[inline]
   fn from(other: [u8; S]) -> Self {
     Self(other)
+  }
+}
+
+#[cfg(feature = "serde")]
+impl<const S: usize> serde::Serialize for Digest<S> {
+  #[inline]
+  fn serialize<T: serde::Serializer>(&self, serializer: T) -> Result<T::Ok, T::Error> {
+    self.as_hex().serialize(serializer)
   }
 }
 
