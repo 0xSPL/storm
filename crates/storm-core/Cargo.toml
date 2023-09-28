@@ -13,24 +13,28 @@ storm-utils = { version = "=0.1", path = "../storm-utils", default-features = fa
 # Compression
 bzip2 = { version = "0.4", default-features = false, optional = true }
 flate2 = { version = "1.0", default-features = false, optional = true, features = ["rust_backend"] }
+storm-adpcm = { version = "=0.1", path = "../storm-adpcm", optional = true, features = ["std"] }
+storm-huffman = { version = "=0.1", path = "../storm-huffman", optional = true, features = ["std"] }
+storm-pklib = { version = "=0.1", path = "../storm-pklib", optional = true, features = ["std"] }
+storm-sparse = { version = "=0.1", path = "../storm-sparse", optional = true, features = ["std"] }
 
 [features]
 default = []
 
 # Enables ADPCM Compression
-adpcm = []
+adpcm = ["dep:storm-adpcm"]
 
 # Enables BZip2 Compression
 bzip2 = ["dep:bzip2"]
 
 # Enables Huffman Coding Compression
-huffman = []
+huffman = ["dep:storm-huffman"]
 
 # Enables PKWare Compression
-pkware = []
+pkware = ["dep:storm-pklib"]
 
 # Enables Sparse Compression
-sparse = []
+sparse = ["dep:storm-sparse"]
 
 # Enables ZLib Compression
 zlib = ["dep:flate2"]

@@ -3,6 +3,8 @@ use std::fmt::Display;
 use std::fmt::Formatter;
 use std::fmt::Result as FmtResult;
 
+use crate::utils::CompressionFormat;
+
 pub type Result<T, E = Error> = core::result::Result<T, E>;
 
 #[derive(Debug)]
@@ -52,8 +54,13 @@ impl Display for Error {
       ErrorKind::DecompressionInvalid(mode) => {
         write!(f, "invalid decompression algorithm: {mode:#04X}")
       }
-      ErrorKind::DecompressionFeature(feature, name) => {
-        write!(f, "enable `{feature}` feature to use {name}")
+      ErrorKind::DecompressionFeature(format) => {
+        write!(
+          f,
+          "enable `{}` feature to use {}",
+          format.feature(),
+          format.name()
+        )
       }
       ErrorKind::DecompressionNoBytes => {
         write!(f, "attempted decompression on empty buffer")
@@ -108,7 +115,7 @@ pub enum ErrorKind {
   // Decompression Errors
   // ===========================================================================
   DecompressionInvalid(u8),
-  DecompressionFeature(&'static str, &'static str),
+  DecompressionFeature(CompressionFormat),
   DecompressionNoBytes,
   DecompressionFailure,
   DecompressionStatus(&'static str),

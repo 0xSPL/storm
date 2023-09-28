@@ -1,0 +1,77 @@
+use bindgen::Builder;
+use bindgen::CargoCallbacks;
+use cmake::Config;
+use std::env;
+use std::path::Path;
+use std::path::PathBuf;
+
+fn main() {
+  println!("cargo:rerun-if-changed=build.rs");
+
+  // ===========================================================================
+  // 1. Setup Env
+  // ===========================================================================
+
+  let root: &str = env!("CARGO_MANIFEST_DIR");
+  let root: &Path = Path::new(root);
+
+  let dest: String = env::var("OUT_DIR").unwrap();
+  let dest: &Path = Path::new(&dest);
+
+  // ===========================================================================
+  // 2. Compile
+  // ===========================================================================
+
+  let output: PathBuf = Config::new("lib").build();
+  let outdir: PathBuf = output.join("lib");
+
+  // ===========================================================================
+  // 3. Link
+  // ===========================================================================
+
+  println!("cargo:rustc-link-search=native={}", outdir.display());
+  println!("cargo:rustc-link-lib=huffman");
+
+  #[cfg(target_os = "macos")]
+  {
+    println!("cargo:rustc-link-lib=c++");
+  }
+
+  #[cfg(target_os = "linux")]
+  {
+    println!("cargo:rustc-link-lib=stdc++");
+  }
+
+  // ===========================================================================
+  // 4. Generate Bindings
+  // ===========================================================================
+
+  let header: PathBuf = root.join("wrapper.hpp");
+  let header: &str = header.to_str().unwrap();
+
+  let import: PathBuf = root.join("lib");
+  let import: String = format!("-I{}", import.display());
+
+  Builder::default()
+    .allowlist_type("THTreeItem")
+    .allowlist_type("THuffmannTree")
+    .allowlist_type("TInputStream")
+    .allowlist_type("TInsertPoint")
+    .allowlist_type("TOutputStream")
+    .allowlist_type("TQuickLink")
+    .allowlist_var("HUFF_ITEM_COUNT")
+    .allowlist_var("LINK_ITEM_COUNT")
+    .clang_arg(import)
+    .fit_macro_constants(true)
+    .generate_comments(false)
+    .generate_cstr(true)
+    .header(header)
+    .layout_tests(true)
+    .merge_extern_blocks(true)
+    .parse_callbacks(Box::new(CargoCallbacks))
+    .use_core()
+    .generate()
+    .unwrap()
+    .write_to_file(dest.join("bindings.rs"))
+    .unwrap();
+}

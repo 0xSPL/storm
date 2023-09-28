@@ -3,6 +3,7 @@ use crate::error::Error;
 use crate::error::ErrorKind;
 use crate::error::Result;
 
+#[rustfmt::skip]
 pub fn decompress(buffer: &[u8], output: &mut [u8]) -> Result<usize> {
   match buffer {
     [consts::COMP_HUFFMAN, data @ ..] => {
@@ -63,17 +64,66 @@ pub fn decompress(buffer: &[u8], output: &mut [u8]) -> Result<usize> {
 }
 
 // =============================================================================
+// Compression Format
+// =============================================================================
+
+#[derive(Clone, Copy, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
+pub enum CompressionFormat {
+  Adpcm(bool),
+  BZip2,
+  Deflate,
+  Huffman,
+  PkWare,
+  Sparse,
+}
+
+impl CompressionFormat {
+  #[inline]
+  pub const fn feature(&self) -> &'static str {
+    match self {
+      Self::Adpcm(_) => "adpcm",
+      Self::BZip2 => "bzip2",
+      Self::Deflate => "zlib",
+      Self::Huffman => "huffman",
+      Self::PkWare => "pkware",
+      Self::Sparse => "sparse",
+    }
+  }
+
+  #[inline]
+  pub const fn name(&self) -> &'static str {
+    match self {
+      Self::Adpcm(true) => "IMA ADPCM (stereo) Compression",
+      Self::Adpcm(false) => "IMA ADPCM (mono) Compression",
+      Self::BZip2 => "BZip2 Compression",
+      Self::Deflate => "ZLib Compression",
+      Self::Huffman => "Huffman Coding",
+      Self::PkWare => "PkWare Compression",
+      Self::Sparse => "Sparse Compression",
+    }
+  }
+}
+
+// =============================================================================
 // Huffman
 // =============================================================================
 
 #[cfg(feature = "huffman")]
 pub fn decompress_huffman(buffer: &[u8], output: &mut [u8]) -> Result<usize> {
-  panic!("decompress_huffman");
+  let mut stream: storm_huffman::Decompress = storm_huffman::Decompress::new();
+
+  stream
+    .decompress(buffer, output)
+    .map_err(|error| Error::new_std(ErrorKind::DecompressionFailure, error))?;
+
+  Ok(stream.total_out())
 }
 
 #[cfg(not(feature = "huffman"))]
 pub fn decompress_huffman(_buffer: &[u8], _output: &mut [u8]) -> Result<usize> {
-  Err(Error::new(ErrorKind::DecompressionFeature("huffman", "Huffman Coding")))
+  Err(Error::new(ErrorKind::DecompressionFeature(
+    CompressionFormat::Huffman,
+  )))
 }
 
 // =============================================================================
@@ -100,13 +150,17 @@ pub fn decompress_zlib(buffer: &[u8], output: &mut [u8]) -> Result<usize> {
   if let flate2::Status::StreamEnd = status {
     Ok(stream.total_out() as usize)
   } else {
-    Err(Error::new(ErrorKind::DecompressionStatus(translate(status))))
+    Err(Error::new(ErrorKind::DecompressionStatus(translate(
+      status,
+    ))))
   }
 }
 
 #[cfg(not(feature = "zlib"))]
 pub fn decompress_zlib(_buffer: &[u8], _output: &mut [u8]) -> Result<usize> {
-  Err(Error::new(ErrorKind::DecompressionFeature("zlib", "ZLib Compression")))
+  Err(Error::new(ErrorKind::DecompressionFeature(
+    CompressionFormat::Deflate,
+  )))
 }
 
 // =============================================================================
@@ -115,12 +169,20 @@ pub fn decompress_zlib(_buffer: &[u8], _output: &mut [u8]) -> Result<usize> {
 
 #[cfg(feature = "pkware")]
 pub fn decompress_pkware(buffer: &[u8], output: &mut [u8]) -> Result<usize> {
-  panic!("decompress_pkware");
+  let mut stream: storm_pklib::Decompress = storm_pklib::Decompress::new();
+
+  stream
+    .decompress(buffer, output)
+    .map_err(|error| Error::new_std(ErrorKind::DecompressionFailure, error))?;
+
+  Ok(stream.total_out())
 }
 
 #[cfg(not(feature = "pkware"))]
 pub fn decompress_pkware(_buffer: &[u8], _output: &mut [u8]) -> Result<usize> {
-  Err(Error::new(ErrorKind::DecompressionFeature("pkware", "PKWare Compression")))
+  Err(Error::new(ErrorKind::DecompressionFeature(
+    CompressionFormat::PkWare,
+  )))
 }
 
 // =============================================================================
@@ -149,13 +211,17 @@ pub fn decompress_bzip2(buffer: &[u8], output: &mut [u8]) -> Result<usize> {
   if let bzip2::Status::Ok | bzip2::Status::StreamEnd = status {
     Ok(stream.total_out() as usize)
   } else {
-    Err(Error::new(ErrorKind::DecompressionStatus(translate(status))))
+    Err(Error::new(ErrorKind::DecompressionStatus(translate(
+      status,
+    ))))
   }
 }
 
 #[cfg(not(feature = "bzip2"))]
 pub fn decompress_bzip2(_buffer: &[u8], _output: &mut [u8]) -> Result<usize> {
-  Err(Error::new(ErrorKind::DecompressionFeature("bzip2", "BZip2 Compression")))
+  Err(Error::new(ErrorKind::DecompressionFeature(
+    CompressionFormat::BZip2,
+  )))
 }
 
 // =============================================================================
@@ -163,13 +229,21 @@ pub fn decompress_bzip2(_buffer: &[u8], _output: &mut [u8]) -> Result<usize> {
 // =============================================================================
 
 #[cfg(feature = "sparse")]
-pub fn decompress_sparse(_buffer: &[u8], _output: &mut [u8]) -> Result<usize> {
-  panic!("decompress_sparse");
+pub fn decompress_sparse(buffer: &[u8], output: &mut [u8]) -> Result<usize> {
+  let mut stream: storm_sparse::Decompress = storm_sparse::Decompress::new();
+
+  stream
+    .decompress(buffer, output)
+    .map_err(|error| Error::new_std(ErrorKind::DecompressionFailure, error))?;
+
+  Ok(stream.total_out())
 }
 
 #[cfg(not(feature = "sparse"))]
 pub fn decompress_sparse(_buffer: &[u8], _output: &mut [u8]) -> Result<usize> {
-  Err(Error::new(ErrorKind::DecompressionFeature("sparse", "Sparse Compression")))
+  Err(Error::new(ErrorKind::DecompressionFeature(
+    CompressionFormat::Sparse,
+  )))
 }
 
 // =============================================================================
@@ -178,14 +252,24 @@ pub fn decompress_sparse(_buffer: &[u8], _output: &mut [u8]) -> Result<usize> {
 
 #[cfg(feature = "adpcm")]
 pub fn decompress_adpcm(buffer: &[u8], output: &mut [u8], channels: usize) -> Result<usize> {
-  panic!("decompress_adpcm");
+  let mut stream: storm_adpcm::Decompress = storm_adpcm::Decompress::new(channels);
+
+  stream
+    .decompress(buffer, output)
+    .map_err(|error| Error::new_std(ErrorKind::DecompressionFailure, error))?;
+
+  Ok(stream.total_out())
 }
 
 #[cfg(not(feature = "adpcm"))]
 pub fn decompress_adpcm(_buffer: &[u8], _output: &mut [u8], channels: usize) -> Result<usize> {
   if channels == 1 {
-    Err(Error::new(ErrorKind::DecompressionFeature("adpcm", "IMA ADPCM (mono) Compression")))
+    Err(Error::new(ErrorKind::DecompressionFeature(
+      CompressionFormat::Adpcm(false),
+    )))
   } else {
-    Err(Error::new(ErrorKind::DecompressionFeature("adpcm", "IMA ADPCM (stereo) Compression")))
+    Err(Error::new(ErrorKind::DecompressionFeature(
+      CompressionFormat::Adpcm(true),
+    )))
   }
 }
