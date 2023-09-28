@@ -16,7 +16,7 @@ serde = { version = "1.0", default-features = false, optional = true, features =
 serde_json = { version = "1.0", default-features = false, optional = true, features = ["std"] }
 
 [features]
-default = ["json"]
+default = []
 
 # Enables serde support
 serde = ["dep:serde"]

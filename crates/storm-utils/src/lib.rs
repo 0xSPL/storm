@@ -1,7 +1,11 @@
 //! Utilities for working with MPQ archives.
 
-pub mod consts;
+#![cfg_attr(docsrs, feature(doc_cfg))]
+
+#[macro_use]
 mod macros;
+
+pub mod consts;
 pub mod traits;
 pub mod utils;
 

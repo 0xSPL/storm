@@ -86,13 +86,17 @@ where
   }
 }
 
-#[cfg(feature = "serde")]
-impl<T> serde::Serialize for Hex<T>
-where
-  T: AsRef<[u8]> + ?Sized,
-{
-  #[inline]
-  fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-    serializer.collect_str(self)
+only_serde! {
+  use serde::Serialize;
+  use serde::Serializer;
+
+  impl<T> Serialize for Hex<T>
+  where
+    T: AsRef<[u8]> + ?Sized,
+  {
+    #[inline]
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      serializer.collect_str(self)
+    }
   }
 }

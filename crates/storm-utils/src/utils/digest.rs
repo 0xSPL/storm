@@ -99,11 +99,15 @@ impl<const S: usize> From<[u8; S]> for Digest<S> {
   }
 }
 
-#[cfg(feature = "serde")]
-impl<const S: usize> serde::Serialize for Digest<S> {
-  #[inline]
-  fn serialize<T: serde::Serializer>(&self, serializer: T) -> Result<T::Ok, T::Error> {
-    self.as_hex().serialize(serializer)
+only_serde! {
+  use serde::Serialize;
+  use serde::Serializer;
+
+  impl<const S: usize> Serialize for Digest<S> {
+    #[inline]
+    fn serialize<T: Serializer>(&self, serializer: T) -> Result<T::Ok, T::Error> {
+      self.as_hex().serialize(serializer)
+    }
   }
 }
 
