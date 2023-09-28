@@ -12,6 +12,7 @@ use crate::utils::Hex;
 
 pub type DigestMd5 = Digest<{ MD5_DIGEST_SIZE }>;
 
+/// A generic hash digest.
 #[derive(Clone, Copy, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Digest<const S: usize>([u8; S]);
 
@@ -27,8 +28,8 @@ impl<const S: usize> Digest<S> {
 
   /// Returns a `Hex` formatter for the digest.
   #[inline]
-  pub const fn as_hex(&self) -> Hex<'_> {
-    Hex::new(&self.0)
+  pub const fn as_hex(&self) -> &Hex {
+    Hex::from_slice(&self.0)
   }
 
   /// Returns the digest as a slice of bytes.

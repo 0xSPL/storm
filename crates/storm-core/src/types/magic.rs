@@ -55,8 +55,8 @@ impl Magic {
 
   /// Returns a `Hex` formatter for the magic signature.
   #[inline]
-  pub const fn as_hex(&self) -> Hex<'_, 8> {
-    Hex::new(&self.0)
+  pub const fn as_hex(&self) -> &Hex {
+    Hex::from_slice(&self.0)
   }
 
   #[inline]

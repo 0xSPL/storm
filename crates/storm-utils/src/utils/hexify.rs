@@ -9,26 +9,39 @@ use core::fmt::Write;
 static ALPHA_LOWER: &[u8; 16] = b"0123456789abcdef";
 static ALPHA_UPPER: &[u8; 16] = b"0123456789ABCDEF";
 
-pub struct Hex<'a>(&'a [u8]);
+/// Formatter to display byte slices as base-16.
+#[repr(transparent)]
+pub struct Hex<T: ?Sized = [u8]>(T);
 
-impl<'a> Hex<'a> {
-  /// Create a new `Hex`.
+impl Hex {
+  /// Create a new `Hex` formatter from a slice of bytes.
   #[inline]
-  pub const fn new(data: &'a [u8]) -> Self {
-    Self(data)
+  pub const fn from_slice(data: &[u8]) -> &Self {
+    // SAFETY: Hex is `repr(transparent)` and borrowed from `data`.
+    unsafe {
+      &*(data as *const [u8] as *const Self)
+    }
   }
+}
 
-  fn write<W: Write>(
+impl<T> Hex<T>
+where
+  T: AsRef<[u8]> + ?Sized,
+{
+  fn write<W>(
     &self,
     writer: &mut W,
     pretty: bool,
     alphabet: &'static [u8; 16],
-  ) -> FmtResult {
+  ) -> FmtResult
+  where
+    W: Write,
+  {
     if pretty {
       writer.write_str("0x")?;
     }
 
-    for byte in self.0 {
+    for byte in self.0.as_ref() {
       writer.write_char(char::from(alphabet[((byte >> 4) & 0xF) as usize]))?;
       writer.write_char(char::from(alphabet[(byte & 0xF) as usize]))?;
     }
@@ -37,34 +50,49 @@ impl<'a> Hex<'a> {
   }
 }
 
-impl Debug for Hex<'_> {
+impl<T> Debug for Hex<T>
+where
+  T: AsRef<[u8]> + ?Sized,
+{
   fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
     self.write(f, f.alternate(), ALPHA_LOWER)
   }
 }
 
-impl Display for Hex<'_> {
+impl<T> Display for Hex<T>
+where
+  T: AsRef<[u8]> + ?Sized,
+{
   fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
     self.write(f, f.alternate(), ALPHA_LOWER)
   }
 }
 
-impl LowerHex for Hex<'_> {
+impl<T> LowerHex for Hex<T>
+where
+  T: AsRef<[u8]> + ?Sized,
+{
   fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
     self.write(f, f.alternate(), ALPHA_LOWER)
   }
 }
 
-impl UpperHex for Hex<'_> {
+impl<T> UpperHex for Hex<T>
+where
+  T: AsRef<[u8]> + ?Sized,
+{
   fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
     self.write(f, f.alternate(), ALPHA_UPPER)
   }
 }
 
 #[cfg(feature = "serde")]
-impl serde::Serialize for Hex<'_> {
+impl<T> serde::Serialize for Hex<T>
+where
+  T: AsRef<[u8]> + ?Sized,
+{
   #[inline]
-  fn serialize<T: serde::Serializer>(&self, serializer: T) -> Result<T::Ok, T::Error> {
+  fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
     serializer.collect_str(self)
   }
 }
