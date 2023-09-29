@@ -54,15 +54,14 @@ impl Image {
     &self.layers
   }
 
-  pub fn export_png<P: AsRef<Path>>(&self, path: P, index: usize) -> Result<()> {
-    fn export(path: &Path, image: &RgbaImage) -> Result<()> {
-      image
-        .save_with_format(path.with_extension("png"), ImageFormat::Png)
-        .map_err(|error| Error::new_std(ErrorKind::Other, error))
-    }
-
+  pub fn export_png<P>(&self, path: &P, index: usize) -> Result<()>
+  where
+    P: AsRef<Path> + ?Sized,
+  {
     if let Some(image) = self.layers.get(index) {
-      export(path.as_ref(), image)?;
+      image
+        .save_with_format(path.as_ref().with_extension("png"), ImageFormat::Png)
+        .map_err(|error| Error::new_std(ErrorKind::Other, error))?;
     }
 
     Ok(())

@@ -5,5 +5,6 @@
 #[macro_use]
 extern crate storm_utils;
 
+pub mod bundle;
 pub mod document;
 pub mod image;
