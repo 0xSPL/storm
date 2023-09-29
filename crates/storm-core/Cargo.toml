@@ -18,6 +18,9 @@ storm-huffman = { version = "=0.1", path = "../storm-huffman", optional = true, 
 storm-pklib = { version = "=0.1", path = "../storm-pklib", optional = true, features = ["std"] }
 storm-sparse = { version = "=0.1", path = "../storm-sparse", optional = true, features = ["std"] }
 
+# Serialization
+serde = { version = "1.0", default-features = false, optional = true, features = ["std"] }
+
 [features]
 default = []
 
@@ -38,3 +41,6 @@ sparse = ["dep:storm-sparse"]
 
 # Enables ZLib Compression
 zlib = ["dep:flate2"]
+
+# Enables serde support
+serde = ["dep:serde", "storm-utils/serde"]

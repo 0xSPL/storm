@@ -139,3 +139,25 @@ impl Archive {
     self.load_file("(user data)")
   }
 }
+
+only_serde! {
+  use serde::ser::SerializeStruct;
+  use serde::Serialize;
+  use serde::Serializer;
+
+  impl Serialize for Archive {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      let mut state: S::SerializeStruct = serializer.serialize_struct("Archive", 9)?;
+      state.serialize_field("handle", &self.handle)?;
+      state.serialize_field("offset", &self.offset)?;
+      state.serialize_field("header", &self.header)?;
+      state.serialize_field("udata", &self.udata)?;
+      state.serialize_field("htable", &self.htable)?;
+      state.serialize_field("btable", &self.btable)?;
+      state.serialize_field("ext_htable", &self.ext_htable)?;
+      state.serialize_field("ext_btable", &self.ext_btable)?;
+      state.serialize_field("signature", &self.signature)?;
+      state.end()
+    }
+  }
+}

@@ -135,3 +135,20 @@ impl ParseContext<Magic> for Header {
     }
   }
 }
+
+only_serde! {
+  use serde::Serialize;
+  use serde::Serializer;
+
+  impl Serialize for Header {
+    #[inline]
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      match self {
+        Self::V1(header) => header.serialize(serializer),
+        Self::V2(header) => header.serialize(serializer),
+        Self::V3(header) => header.serialize(serializer),
+        Self::V4(header) => header.serialize(serializer),
+      }
+    }
+  }
+}

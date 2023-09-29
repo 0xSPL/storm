@@ -11,6 +11,12 @@ use core::str::from_utf8;
 use crate::error::Result;
 use crate::types::File;
 
+only_serde! {
+  use serde::ser::Error;
+  use serde::Serialize;
+  use serde::Serializer;
+}
+
 // =============================================================================
 // ListFile
 // =============================================================================
@@ -82,6 +88,15 @@ impl<'a> IntoIterator for &'a mut ListFile {
   }
 }
 
+only_serde! {
+  impl Serialize for ListFile {
+    #[inline]
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      serializer.collect_seq(self.iter())
+    }
+  }
+}
+
 // =============================================================================
 // ListFile Entry
 // =============================================================================
@@ -113,6 +128,15 @@ impl Debug for ListEntry<'_> {
 impl Display for ListEntry<'_> {
   fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
     write!(f, "{}", self.as_utf8().map_err(|_| FmtError)?)
+  }
+}
+
+only_serde! {
+  impl Serialize for ListEntry<'_> {
+    #[inline]
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      self.as_utf8().map_err(Error::custom)?.serialize(serializer)
+    }
   }
 }
 

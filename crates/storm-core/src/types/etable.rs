@@ -14,6 +14,12 @@ use crate::error::Error;
 use crate::error::ErrorKind;
 use crate::types::Magic;
 
+only_serde! {
+  use serde::ser::SerializeStruct;
+  use serde::Serialize;
+  use serde::Serializer;
+}
+
 // =============================================================================
 // Table Behaviour
 // =============================================================================
@@ -159,6 +165,18 @@ where
   }
 }
 
+only_serde! {
+  impl<M> Serialize for ExtHeader<M> {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      let mut state: S::SerializeStruct = serializer.serialize_struct("ExtHeader", 3)?;
+      state.serialize_field("magic", &self.magic)?;
+      state.serialize_field("version", &self.version)?;
+      state.serialize_field("data_size", &self.data_size)?;
+      state.end()
+    }
+  }
+}
+
 // =============================================================================
 // Extended Hash Table
 // =============================================================================
@@ -224,6 +242,24 @@ impl ParseContext<HETHeader> for ExtHTable {
       index_size: reader.read_u32_le()?,
       index_table_size: reader.read_u32_le()?,
     })
+  }
+}
+
+only_serde! {
+  impl Serialize for ExtHTable {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      let mut state: S::SerializeStruct = serializer.serialize_struct("ExtHTable", 9)?;
+      state.serialize_field("header", &self.header)?;
+      state.serialize_field("table_size", &self.table_size)?;
+      state.serialize_field("entry_count", &self.entry_count)?;
+      state.serialize_field("total_count", &self.total_count)?;
+      state.serialize_field("name_hash_bit_size", &self.name_hash_bit_size)?;
+      state.serialize_field("index_size_total", &self.index_size_total)?;
+      state.serialize_field("index_size_extra", &self.index_size_extra)?;
+      state.serialize_field("index_size", &self.index_size)?;
+      state.serialize_field("index_table_size", &self.index_table_size)?;
+      state.end()
+    }
   }
 }
 
@@ -333,5 +369,31 @@ impl ParseContext<BETHeader> for ExtBTable {
       name_hash_array_size: reader.read_u32_le()?,
       flag_count: reader.read_u32_le()?,
     })
+  }
+}
+
+only_serde! {
+  impl Serialize for ExtBTable {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      let mut state: S::SerializeStruct = serializer.serialize_struct("ExtBTable", 17)?;
+      state.serialize_field("header", &self.header)?;
+      state.serialize_field("table_size", &self.table_size)?;
+      state.serialize_field("entry_count", &self.entry_count)?;
+      state.serialize_field("entry_size", &self.entry_size)?;
+      state.serialize_field("bi_file_position", &self.bi_file_position)?;
+      state.serialize_field("bi_file_size", &self.bi_file_size)?;
+      state.serialize_field("bi_comp_size", &self.bi_comp_size)?;
+      state.serialize_field("bi_flag_index", &self.bi_flag_index)?;
+      state.serialize_field("bc_file_position", &self.bc_file_position)?;
+      state.serialize_field("bc_file_size", &self.bc_file_size)?;
+      state.serialize_field("bc_comp_size", &self.bc_comp_size)?;
+      state.serialize_field("bc_flag_index", &self.bc_flag_index)?;
+      state.serialize_field("bt_name_hash_2", &self.bt_name_hash_2)?;
+      state.serialize_field("be_name_hash_2", &self.be_name_hash_2)?;
+      state.serialize_field("bc_name_hash_2", &self.bc_name_hash_2)?;
+      state.serialize_field("name_hash_array_size", &self.name_hash_array_size)?;
+      state.serialize_field("flag_count", &self.flag_count)?;
+      state.end()
+    }
   }
 }

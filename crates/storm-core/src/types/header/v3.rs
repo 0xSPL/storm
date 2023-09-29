@@ -80,3 +80,21 @@ impl ParseContext<HeaderV2> for HeaderV3 {
     })
   }
 }
+
+only_serde! {
+  use serde::__private::ser::FlatMapSerializer;
+  use serde::ser::SerializeMap;
+  use serde::Serialize;
+  use serde::Serializer;
+
+  impl Serialize for HeaderV3 {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      let mut state: S::SerializeMap = serializer.serialize_map(Some(15))?;
+      self.v2.serialize(FlatMapSerializer(&mut state))?;
+      state.serialize_entry("archive_size_64", &self.archive_size_64)?;
+      state.serialize_entry("bet_table_position", &self.bet_table_position)?;
+      state.serialize_entry("het_table_position", &self.het_table_position)?;
+      state.end()
+    }
+  }
+}

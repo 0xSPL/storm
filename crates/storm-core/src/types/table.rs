@@ -12,6 +12,12 @@ use crate::error::Error;
 use crate::traits::Table;
 use crate::traits::TableEntry;
 
+only_serde! {
+  use serde::ser::SerializeStruct;
+  use serde::Serialize;
+  use serde::Serializer;
+}
+
 // =============================================================================
 // Static Assertions
 // =============================================================================
@@ -104,6 +110,19 @@ where
   }
 }
 
+only_serde! {
+  impl<T> Serialize for GenericTable<T>
+  where
+    Self: Table,
+    T: TableEntry + Serialize,
+  {
+    #[inline]
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      serializer.collect_seq(self.filter())
+    }
+  }
+}
+
 // =============================================================================
 // Hash Table Entry
 // =============================================================================
@@ -174,6 +193,20 @@ impl Parse for HTableEntry {
       _padding: reader.read_u8()?,
       position: reader.read_u32_le()?,
     })
+  }
+}
+
+only_serde! {
+  impl Serialize for HTableEntry {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      let mut state: S::SerializeStruct = serializer.serialize_struct("HTableEntry", 5)?;
+      state.serialize_field("hash1", &self.hash1)?;
+      state.serialize_field("hash2", &self.hash2)?;
+      state.serialize_field("language", &self.language)?;
+      state.serialize_field("platform", &self.platform)?;
+      state.serialize_field("position", &self.position)?;
+      state.end()
+    }
   }
 }
 
@@ -295,6 +328,19 @@ impl Parse for BTableEntry {
   }
 }
 
+only_serde! {
+  impl serde::Serialize for BTableEntry {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      let mut state: S::SerializeStruct = serializer.serialize_struct("BTableEntry", 4)?;
+      state.serialize_field("offset", &self.offset)?;
+      state.serialize_field("comp_size", &self.comp_size)?;
+      state.serialize_field("file_size", &self.file_size)?;
+      state.serialize_field("bitflags", &self.bitflags)?;
+      state.end()
+    }
+  }
+}
+
 // =============================================================================
 // Block Table Entry Flags
 // =============================================================================
@@ -334,5 +380,14 @@ bitflags! {
     const COMPRESSED = 0x00000200;
     /// File is imploded. File cannot be compressed.
     const IMPLODED = 0x00000100;
+  }
+}
+
+only_serde! {
+  impl Serialize for BTableEntryFlags {
+    #[inline]
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      serializer.collect_str(self)
+    }
   }
 }

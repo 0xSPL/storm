@@ -7,6 +7,12 @@ use crate::error::Result;
 use crate::types::File;
 use crate::utils::convert_filetime;
 
+only_serde! {
+  use serde::ser::SerializeStruct;
+  use serde::Serialize;
+  use serde::Serializer;
+}
+
 // =============================================================================
 // Attribute File
 // =============================================================================
@@ -42,6 +48,50 @@ impl AttrFile {
     })
   }
 }
+
+only_serde! {
+  impl Serialize for AttrFile {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      let mut state: S::SerializeStruct = serializer.serialize_struct("AttrFile", 5)?;
+      state.serialize_field("version", &self.version)?;
+      state.serialize_field("bitflags", &self.bitflags)?;
+      state.serialize_field("crc", &self.crc)?;
+      state.serialize_field("time", &self.time)?;
+      state.serialize_field("md5", &self.md5)?;
+      state.end()
+    }
+  }
+}
+
+// =============================================================================
+// Attribute Flags
+// =============================================================================
+
+bitflags! {
+  /// Attribute File Flags.
+  #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
+  pub struct AttrFlags: u32 {
+    /// File has CRC32 attributes.
+    const CRC = 0x00000001;
+    /// File has timestamp attributes.
+    const TIME = 0x00000002;
+    /// File has md5 attributes.
+    const MD5 = 0x00000004;
+  }
+}
+
+only_serde! {
+  impl Serialize for AttrFlags {
+    #[inline]
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      serializer.collect_str(self)
+    }
+  }
+}
+
+// =============================================================================
+// Parsing
+// =============================================================================
 
 fn read_crc<R: ReadExt>(reader: &mut R, entries: u32, bitflags: AttrFlags) -> Result<Box<[u32]>> {
   if !bitflags.contains(AttrFlags::CRC) {
@@ -103,21 +153,4 @@ fn read_md5<R: ReadExt>(
   }
 
   Ok(data.into_boxed_slice())
-}
-
-// =============================================================================
-// Attribute Flags
-// =============================================================================
-
-bitflags! {
-  /// Attribute File Flags.
-  #[derive(Clone, Copy, Debug, Hash, PartialEq, Eq)]
-  pub struct AttrFlags: u32 {
-    /// File has CRC32 attributes.
-    const CRC = 0x00000001;
-    /// File has timestamp attributes.
-    const TIME = 0x00000002;
-    /// File has md5 attributes.
-    const MD5 = 0x00000004;
-  }
 }

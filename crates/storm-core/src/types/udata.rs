@@ -61,3 +61,20 @@ impl ParseContext<Magic> for UserData {
     })
   }
 }
+
+only_serde! {
+  use serde::ser::SerializeStruct;
+  use serde::Serialize;
+  use serde::Serializer;
+
+  impl Serialize for UserData {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      let mut state: S::SerializeStruct = serializer.serialize_struct("UserData", 4)?;
+      state.serialize_field("magic", &self.magic)?;
+      state.serialize_field("udata_size", &self.udata_size)?;
+      state.serialize_field("header_offset", &self.header_offset)?;
+      state.serialize_field("udata_header_size", &self.udata_header_size)?;
+      state.end()
+    }
+  }
+}

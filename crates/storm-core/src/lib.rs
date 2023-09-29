@@ -1,5 +1,7 @@
 //! Core tools for working with MPQ archives.
 
+#![cfg_attr(docsrs, feature(doc_cfg))]
+
 #[macro_use]
 extern crate storm_utils;
 

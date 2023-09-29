@@ -90,3 +90,25 @@ impl ParseContext<Magic> for HeaderV1 {
     })
   }
 }
+
+only_serde! {
+  use serde::ser::SerializeStruct;
+  use serde::Serialize;
+  use serde::Serializer;
+
+  impl Serialize for HeaderV1 {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      let mut state: S::SerializeStruct = serializer.serialize_struct("HeaderV1", 9)?;
+      state.serialize_field("magic", &self.magic)?;
+      state.serialize_field("header_size", &self.header_size)?;
+      state.serialize_field("archive_size", &self.archive_size)?;
+      state.serialize_field("format_version", &self.format_version)?;
+      state.serialize_field("sector_size_shift", &self.sector_size_shift)?;
+      state.serialize_field("htable_offset", &self.htable_offset)?;
+      state.serialize_field("btable_offset", &self.btable_offset)?;
+      state.serialize_field("htable_entries", &self.htable_entries)?;
+      state.serialize_field("btable_entries", &self.btable_entries)?;
+      state.end()
+    }
+  }
+}

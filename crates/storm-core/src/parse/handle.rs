@@ -130,3 +130,18 @@ impl Seek for Handle {
     self.file.seek(from)
   }
 }
+
+only_serde! {
+  use serde::ser::SerializeStruct;
+  use serde::Serialize;
+  use serde::Serializer;
+
+  impl Serialize for Handle {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      let mut state: S::SerializeStruct = serializer.serialize_struct("Handle", 2)?;
+      state.serialize_field("path", self.path())?;
+      state.serialize_field("size", &self.size())?;
+      state.end()
+    }
+  }
+}

@@ -172,3 +172,30 @@ impl ParseContext<HeaderV3> for HeaderV4 {
     })
   }
 }
+
+only_serde! {
+  use serde::__private::ser::FlatMapSerializer;
+  use serde::ser::SerializeMap;
+  use serde::Serialize;
+  use serde::Serializer;
+
+  impl Serialize for HeaderV4 {
+    fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+      let mut state: S::SerializeMap = serializer.serialize_map(Some(27))?;
+      self.v3.serialize(FlatMapSerializer(&mut state))?;
+      state.serialize_entry("htable_size", &self.htable_size)?;
+      state.serialize_entry("btable_size", &self.btable_size)?;
+      state.serialize_entry("hi_btable_size", &self.hi_btable_size)?;
+      state.serialize_entry("het_table_size", &self.het_table_size)?;
+      state.serialize_entry("bet_table_size", &self.bet_table_size)?;
+      state.serialize_entry("raw_chunk_size", &self.raw_chunk_size)?;
+      state.serialize_entry("md5_btable", &self.md5_btable)?;
+      state.serialize_entry("md5_htable", &self.md5_htable)?;
+      state.serialize_entry("md5_hi_btable", &self.md5_hi_btable)?;
+      state.serialize_entry("md5_bet_table", &self.md5_bet_table)?;
+      state.serialize_entry("md5_het_table", &self.md5_het_table)?;
+      state.serialize_entry("md5_mpq_header", &self.md5_mpq_header)?;
+      state.end()
+    }
+  }
+}
