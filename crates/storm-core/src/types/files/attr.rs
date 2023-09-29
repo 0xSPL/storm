@@ -3,7 +3,9 @@ use storm_utils::bitflags;
 use storm_utils::traits::ReadExt;
 use storm_utils::utils::DigestMd5;
 
+use crate::error::Error;
 use crate::error::Result;
+use crate::extract::FilePtr;
 use crate::types::File;
 use crate::utils::convert_filetime;
 
@@ -46,6 +48,18 @@ impl AttrFile {
       time: read_time(&mut reader, entries, bitflags)?,
       md5: read_md5(&mut reader, entries, bitflags)?,
     })
+  }
+}
+
+impl TryFrom<FilePtr<'_>> for AttrFile {
+  type Error = Error;
+
+  #[inline]
+  fn try_from(other: FilePtr<'_>) -> Result<Self, Self::Error> {
+    let size: u32 = other.archive.header.btable_entries;
+    let data: File = other.read()?;
+
+    Self::new(data, size)
   }
 }
 

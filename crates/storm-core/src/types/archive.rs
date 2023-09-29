@@ -114,19 +114,12 @@ impl Archive {
 
   /// Load the `(listfile)` from the archive.
   pub fn load_listfile(&self) -> Result<ListFile> {
-    let data: File = self.load_file("(listfile)")?;
-    let file: ListFile = ListFile::new(data);
-
-    Ok(file)
+    self.find_file("(listfile)").and_then(ListFile::try_from)
   }
 
   /// Load the `(attributes)` from the archive.
   pub fn load_attributes(&self) -> Result<AttrFile> {
-    let size: u32 = self.header.btable_entries;
-    let data: File = self.load_file("(attributes)")?;
-    let file: AttrFile = AttrFile::new(data, size)?;
-
-    Ok(file)
+    self.find_file("(attributes)").and_then(AttrFile::try_from)
   }
 
   /// Load the `(signature)` from the archive.

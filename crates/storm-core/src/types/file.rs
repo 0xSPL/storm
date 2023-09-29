@@ -1,7 +1,10 @@
 use core::fmt::Debug;
 use core::fmt::Formatter;
-use core::fmt::Result;
+use core::fmt::Result as FmtResult;
 use core::ops::Deref;
+
+use crate::error::Error;
+use crate::extract::FilePtr;
 
 // =============================================================================
 // File
@@ -40,6 +43,21 @@ impl File {
   }
 }
 
+impl Debug for File {
+  fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+    f.debug_struct("File")
+      .field("size", &self.size())
+      .finish_non_exhaustive()
+  }
+}
+
+impl Default for File {
+  #[inline]
+  fn default() -> Self {
+    Self::empty()
+  }
+}
+
 impl Deref for File {
   type Target = [u8];
 
@@ -49,10 +67,11 @@ impl Deref for File {
   }
 }
 
-impl Debug for File {
-  fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-    f.debug_struct("File")
-      .field("size", &self.size())
-      .finish_non_exhaustive()
+impl TryFrom<FilePtr<'_>> for File {
+  type Error = Error;
+
+  #[inline]
+  fn try_from(other: FilePtr<'_>) -> Result<Self, Self::Error> {
+    other.read()
   }
 }

@@ -8,7 +8,9 @@ use core::ops::Deref;
 use core::slice::Split;
 use core::str::from_utf8;
 
+use crate::error::Error;
 use crate::error::Result;
+use crate::extract::FilePtr;
 use crate::types::File;
 
 only_serde! {
@@ -27,6 +29,12 @@ only_serde! {
 pub struct ListFile(File);
 
 impl ListFile {
+  /// Create an new, empty `ListFile`.
+  #[inline]
+  pub const fn empty() -> Self {
+    Self::new(File::empty())
+  }
+
   /// Create a new `ListFile`.
   #[inline]
   pub const fn new(file: File) -> Self {
@@ -59,6 +67,13 @@ impl Debug for ListFile {
   }
 }
 
+impl Default for ListFile {
+  #[inline]
+  fn default() -> Self {
+    Self::empty()
+  }
+}
+
 impl Deref for ListFile {
   type Target = File;
 
@@ -85,6 +100,15 @@ impl<'a> IntoIterator for &'a mut ListFile {
   #[inline]
   fn into_iter(self) -> Self::IntoIter {
     self.iter()
+  }
+}
+
+impl TryFrom<FilePtr<'_>> for ListFile {
+  type Error = Error;
+
+  #[inline]
+  fn try_from(other: FilePtr<'_>) -> Result<Self, Self::Error> {
+    other.read().map(Self::new)
   }
 }
 
