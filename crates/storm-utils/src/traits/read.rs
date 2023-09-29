@@ -1,6 +1,7 @@
 use byteorder::ReadBytesExt;
 use byteorder::BE;
 use byteorder::LE;
+use core::mem::MaybeUninit;
 use std::io;
 use std::io::Read;
 
@@ -82,15 +83,16 @@ pub trait ReadExt: Read {
   fn read_array<T, F, const S: usize>(&mut self, f: F) -> io::Result<[T; S]>
   where
     F: Fn(&mut Self) -> io::Result<T>,
-    T: Copy + Default,
   {
-    let mut array: [T; S] = [Default::default(); S];
+    // SAFETY: An uninitialized `[MaybeUninit<T>; S]` is valid.
+    let mut array: [MaybeUninit<T>; S] = unsafe { MaybeUninit::zeroed().assume_init() };
 
     for item in array.iter_mut() {
-      *item = f(self)?;
+      item.write(f(self)?);
     }
 
-    Ok(array)
+    // SAFETY: All elements of the array were just initialized
+    Ok(array.map(|item| unsafe { MaybeUninit::assume_init(item) }))
   }
 
   #[inline]

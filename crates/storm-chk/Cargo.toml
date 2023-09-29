@@ -1,0 +1,12 @@
+[package]
+name = "storm-chk"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+
+[dependencies]
+# Core
+encoding_rs = { version = "0.8", default-features = false, features = ["alloc"] }
+storm-core = { version = "=0.1", path = "../storm-core", default-features = false }
+storm-utils = { version = "=0.1", path = "../storm-utils", default-features = false }

@@ -8,6 +8,7 @@ readme = "README.md"
 [workspace]
 members = [
   "crates/storm-adpcm",
+  "crates/storm-chk",
   "crates/storm-core",
   "crates/storm-files",
   "crates/storm-huffman",

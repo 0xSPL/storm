@@ -1,4 +1,5 @@
 use std::path::Path;
+use storm_chk::types::ChunkFile;
 use storm_core::error::Result;
 use storm_core::types::Archive;
 use storm_core::types::AttrFile;
@@ -18,6 +19,7 @@ pub struct Bundle {
   pub archive: Archive,
   pub list: ListFile,
   pub attr: Option<AttrFile>,
+  pub schk: Option<ChunkFile>,
   pub data: Box<[BundleFile]>,
 }
 
@@ -29,12 +31,14 @@ impl Bundle {
     let archive: Archive = Archive::open(path)?;
     let list: ListFile = fetch_list(&archive)?;
     let attr: Option<AttrFile> = fetch_attr(&archive)?;
+    let schk: Option<ChunkFile> = fetch_chk(&archive)?;
     let data: Box<[BundleFile]> = fetch_data(&archive, &list)?;
 
     Ok(Self {
       archive,
       list,
       attr,
+      schk,
       data,
     })
   }
@@ -56,13 +60,21 @@ fn fetch_attr(archive: &Archive) -> Result<Option<AttrFile>> {
   }
 }
 
+fn fetch_chk(archive: &Archive) -> Result<Option<ChunkFile>> {
+  if let Ok(pointer) = archive.find_file("staredit\\scenario.chk") {
+    pointer.try_into().map(Some)
+  } else {
+    Ok(None)
+  }
+}
+
 fn fetch_data(archive: &Archive, list: &ListFile) -> Result<Box<[BundleFile]>> {
   let mut output: Vec<BundleFile> = Vec::with_capacity(list.len());
 
   for entry in list.iter() {
     let name: &str = entry.as_utf8()?;
 
-    if name == "(listfile)" || name == "(attributes)" {
+    if name == "(listfile)" || name == "(attributes)" || name == "staredit\\scenario.chk" {
       continue;
     }
 

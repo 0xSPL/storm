@@ -14,8 +14,9 @@ pub struct Error {
 }
 
 impl Error {
+  #[doc(hidden)]
   #[inline]
-  pub(crate) const fn new(kind: ErrorKind) -> Self {
+  pub const fn new(kind: ErrorKind) -> Self {
     Self {
       kind,
       from: ErrorSource::Ignore,
@@ -24,13 +25,19 @@ impl Error {
 
   #[doc(hidden)]
   #[inline]
-  pub fn new_std<T>(kind: ErrorKind, source: T) -> Self
-  where
-    T: StdError + 'static,
-  {
+  pub fn new_std(kind: ErrorKind, source: impl StdError + 'static) -> Self {
     Self {
       kind,
       from: ErrorSource::Source(Box::new(source)),
+    }
+  }
+
+  #[doc(hidden)]
+  #[inline]
+  pub fn message(message: impl Display) -> Self {
+    Self {
+      kind: ErrorKind::Other,
+      from: ErrorSource::String(message.to_string()),
     }
   }
 
@@ -85,6 +92,7 @@ impl StdError for Error {
   fn source(&self) -> Option<&(dyn StdError + 'static)> {
     match self.from {
       ErrorSource::Ignore => None,
+      ErrorSource::String(_) => None,
       ErrorSource::Source(ref source) => Some(&**source),
     }
   }
@@ -148,6 +156,7 @@ pub enum ErrorKind {
 #[derive(Debug)]
 enum ErrorSource {
   Ignore,
+  String(String),
   Source(Box<dyn StdError + 'static>),
 }
 
@@ -155,6 +164,7 @@ impl Display for ErrorSource {
   fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
     match self {
       Self::Ignore => Ok(()),
+      Self::String(inner) => Display::fmt(inner, f),
       Self::Source(inner) => Display::fmt(inner, f),
     }
   }
