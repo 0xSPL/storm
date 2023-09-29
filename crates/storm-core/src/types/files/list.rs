@@ -14,7 +14,7 @@ use crate::extract::FilePtr;
 use crate::types::File;
 
 only_serde! {
-  use serde::ser::Error;
+  use serde::ser;
   use serde::Serialize;
   use serde::Serializer;
 }
@@ -159,7 +159,7 @@ only_serde! {
   impl Serialize for ListEntry<'_> {
     #[inline]
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
-      self.as_utf8().map_err(Error::custom)?.serialize(serializer)
+      self.as_utf8().map_err(ser::Error::custom)?.serialize(serializer)
     }
   }
 }
