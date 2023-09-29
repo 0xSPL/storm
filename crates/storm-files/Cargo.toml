@@ -19,3 +19,6 @@ default = []
 
 # Enables serde support
 serde = ["dep:serde"]
+
+# Enables JSON conveniences
+json = ["serde", "storm-utils/json"]
