@@ -7,7 +7,7 @@ readme = "README.md"
 
 [dependencies]
 # Core
-byteorder = { version = "1.4", default-features = false, features = ["std"] }
+byteorder = { version = "1.5", default-features = false, features = ["std"] }
 storm-utils = { version = "=0.1", path = "../storm-utils", default-features = false }
 
 # Compression
