@@ -1,5 +1,4 @@
 use bindgen::Builder;
-use bindgen::CargoCallbacks;
 use cmake::Config;
 use std::env;
 use std::path::Path;
@@ -65,7 +64,7 @@ fn main() {
     .header(header)
     .layout_tests(true)
     .merge_extern_blocks(true)
-    .parse_callbacks(Box::new(CargoCallbacks))
+    .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
     .use_core()
     .generate()
     .unwrap()

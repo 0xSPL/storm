@@ -6,7 +6,7 @@ license = "MIT OR Apache-2.0"
 readme = "README.md"
 
 [build-dependencies]
-bindgen = { version = "0.68", default-features = false, features = ["runtime"] }
+bindgen = { version = "0.69", default-features = false, features = ["runtime"] }
 cmake = { version = "0.1", default-features = false }
 
 [features]
